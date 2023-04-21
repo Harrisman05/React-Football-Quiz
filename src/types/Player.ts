@@ -6,4 +6,5 @@ export default interface Player {
     team: string;
     ranking: number;
     goals: number;
+    [key: string]: any;
   }
