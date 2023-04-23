@@ -5,4 +5,5 @@ export default interface QuizPlayerStats {
     nationality: string;
     team: string;
     goals: number;
+    [key: string]: string | number;
 }
