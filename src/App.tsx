@@ -10,7 +10,7 @@ import UserAnswers from './types/UserAnswers';
 function App() {
   const [scorers, setScorers] = useState<Player[]>([]);
   const [statRemove, setStatRemove] = useState<QuizPlayer[]>([]);
-  const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
+  const [userAnswers, setUserAnswers] = useState<Map<any, any>>(new Map());
 
   useEffect(() => {
     const getData = async () => {
@@ -34,7 +34,7 @@ function App() {
     // getData();
   }, []);
 
-  const allPlayers: Player[] = example_json['response'].map(
+  let allPlayers: Player[] = example_json['response'].map(
     (el: PlayerStats, index: number) => ({
       id: el.player.id,
       name: removeAbbrevName(el.player.name),
@@ -69,18 +69,17 @@ function App() {
   const quizPlayers = statRemover(allPlayers);
 
   // console.log(statRemover(allPlayers));
-  // console.log(allPlayers);
+  console.log(allPlayers);
 
   function handleSubmit(e: any) {
     e.preventDefault();
     const form = e.target;
     const formData = new FormData(form);
-    console.log(formData.entries());
     const userAnswersMap = new Map();
 
     for (const [nameId, value] of formData.entries()) {
       const [name, id] = nameId.split('-');
-      console.log(id, name, value);
+      // console.log(id, name, value);
 
       if (!userAnswersMap.has(id)) {
         userAnswersMap.set(id, {
@@ -97,7 +96,44 @@ function App() {
     }
 
     console.log(userAnswersMap);
+    setUserAnswers(userAnswersMap);
+    checkAnswers();
   }
+
+  function checkAnswers() {
+    console.log(scorers);
+    const statRemoveClone = [...statRemove];
+    console.log(statRemoveClone);
+
+    for (let player of statRemoveClone) {
+      console.log(player);
+      console.log(player.id);
+      console.log(userAnswers);
+      const answers = userAnswers.get(player.id.toString());
+      // const checkAnswers = scorers.get(player.id.toString());
+      console.log(answers);
+      console.log(answers.nationality);
+      console.log(player.nationality);
+      if (answers.nationality) {
+        console.log('found nationality')
+        if (scorers[0].nationality === answers.nationality) {
+          console.log('match');
+          player.nationality = answers.nationality;
+        }
+      }
+    }
+    setStatRemove(statRemoveClone);
+  }
+
+  useEffect(() => {
+    // using setState is kinda async, so need to log out update inside a useEffect
+    console.log(statRemove);
+  }, [statRemove]);
+
+  useEffect(() => {
+    // using setState is kinda async, so need to log out update inside a useEffect
+    console.log(userAnswers);
+  }, [userAnswers]);
 
   return (
     <div className='App'>
