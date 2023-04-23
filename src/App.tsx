@@ -5,10 +5,12 @@ import Player from './types/Player';
 import QuizPlayer from './types/QuizPlayer';
 import removeAbbrevName from './utils/removeAbbrevName';
 import randomStatRemove from './utils/randomStatRemove';
+import UserAnswers from './types/UserAnswers';
 
 function App() {
   const [scorers, setScorers] = useState<Player[]>([]);
   const [statRemove, setStatRemove] = useState<QuizPlayer[]>([]);
+  const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
 
   useEffect(() => {
     const getData = async () => {
@@ -66,18 +68,35 @@ function App() {
 
   const quizPlayers = statRemover(allPlayers);
 
-  console.log(statRemover(allPlayers));
-  console.log(allPlayers);
+  // console.log(statRemover(allPlayers));
+  // console.log(allPlayers);
 
   function handleSubmit(e: any) {
     e.preventDefault();
     const form = e.target;
     const formData = new FormData(form);
-    console.log(formData);
+    console.log(formData.entries());
+    const userAnswersMap = new Map();
+
     for (const [nameId, value] of formData.entries()) {
-      const [name, id] = nameId.split('-')
+      const [name, id] = nameId.split('-');
       console.log(id, name, value);
+
+      if (!userAnswersMap.has(id)) {
+        userAnswersMap.set(id, {
+          [name]: value,
+        });
+      } else {
+        const answerObject = userAnswersMap.get(id);
+        const updatedAnswerObject = {
+          ...answerObject,
+          [name]: value,
+        };
+        userAnswersMap.set(id, updatedAnswerObject);
+      }
     }
+
+    console.log(userAnswersMap);
   }
 
   return (
@@ -90,7 +109,10 @@ function App() {
               <div key={player.id} className='flex gap-8'>
                 {player.name === '' ? (
                   <div>
-                    <input name={`name_input-${player.id}`} className='w-40 bg-slate-400' />
+                    <input
+                      name={`name-${player.id}`}
+                      className='w-40 bg-slate-400'
+                    />
                   </div>
                 ) : (
                   <div className='w-40 flex items-center border-s-blue-900'>
@@ -98,7 +120,7 @@ function App() {
                   </div>
                 )}
                 {player.nationality === '' ? (
-                  <input name={`nationality_input-${player.id}`} className='w-40' />
+                  <input name={`nationality-${player.id}`} className='w-40' />
                 ) : (
                   <div className='w-40 flex items-center'>
                     {player.nationality}
@@ -106,13 +128,13 @@ function App() {
                 )}
 
                 {player.team === '' ? (
-                  <input name={`team_input-${player.id}`} className='w-40' />
+                  <input name={`team-${player.id}`} className='w-40' />
                 ) : (
                   <div className='w-40 flex items-center'>{player.team}</div>
                 )}
 
                 {player.goals === 0 ? (
-                  <input name={`goals_input-${player.id}`} className='w-40' />
+                  <input name={`goals-${player.id}`} className='w-40' />
                 ) : (
                   <div className='w-40 flex items-center'>{player.goals}</div>
                 )}
