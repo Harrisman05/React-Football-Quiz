@@ -61,22 +61,25 @@ function App() {
   function statRemover(allStatsPlayers: AllStatsPlayer[]) {
     const allStatsPlayersClone: AllStatsPlayer[] = cloneDeep(allStatsPlayers); // have to clone so that I preserve answers and allow removal of some answers from a distinct reference object (shallow clone could  mess it up as value is object {}, deep clone to be safe)
 
-    const removedStatsPlayers: AllStatsPlayer[] = allStatsPlayersClone.map((el) => {
-      const keyIterator = el.keys(); // had to extend AllStatsPlayer interface to Map to allow use of keys()
-      const key = keyIterator.next().value;
-      console.log(key);
+    const removedStatsPlayers: AllStatsPlayer[] = allStatsPlayersClone.map(
+      (el) => {
+        const keyIterator = el.keys(); // had to extend AllStatsPlayer interface to Map to allow use of keys()
+        const key = keyIterator.next().value;
+        console.log(key);
 
-      const statsToRemove = ['nationality', 'team']; // could be randomiser function
-      const randomIndex = Math.floor(Math.random() * 2);
-      const randomKey = statsToRemove[randomIndex];
+        const statsToRemove = ['nationality', 'team']; // could be randomiser function
+        const randomIndex = Math.floor(Math.random() * 2);
+        const randomKey = statsToRemove[randomIndex];
 
-      if (el.get(key) !== undefined) { // check that the player value is not undefined, better safety
-        // Non-null expression You can postfix an expression with ! to tell TypeScript that you know it's not null or undefined. This works the same as an 'as' assertion.
-        el.get(key)![randomKey] = ''
-        el.get(key)!.name = ''; // always remove name
+        if (el.get(key) !== undefined) {
+          // check that the player value is not undefined, better safety
+          // Non-null expression You can postfix an expression with ! to tell TypeScript that you know it's not null or undefined. This works the same as an 'as' assertion.
+          el.get(key)![randomKey] = '';
+          el.get(key)!.name = ''; // always remove name
+        }
+        return el;
       }
-      return el;
-    });
+    );
     return removedStatsPlayers;
   }
 
@@ -97,7 +100,8 @@ function App() {
       const id = Number(idStr); // values coming from form are always strings, convert to number to avoid type errors
       console.log(id, name, value);
 
-      if (!userAnswersMap.has(id)) { // set if as a key on the user answer map
+      if (!userAnswersMap.has(id)) {
+        // set if as a key on the user answer map
         userAnswersMap.set(id, {
           [name]: value,
         });
@@ -187,13 +191,16 @@ function App() {
 
   return (
     <div className='App'>
-      <button onClick={() => setStatRemove(removedStatsPlayers)}>see data</button>
+      <button onClick={() => setStatRemove(removedStatsPlayers)}>
+        see data
+      </button>
       <div className='bg-red-600 flex-col'>
         <form onSubmit={handleSubmit}>
           {statRemove.map((player: any) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
             return (
               <div key={id.toString()} className='flex gap-8'>
+                <div className='w-40 flex items-center'>{stats.ranking}</div>
                 {stats.name === '' ? (
                   <input name={`name-${id}`} className='w-40 bg-slate-400' />
                 ) : (
