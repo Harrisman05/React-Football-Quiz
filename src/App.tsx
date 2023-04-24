@@ -1,7 +1,7 @@
 import { ReactEventHandler, useEffect, useState } from 'react';
 import example_json from './assets/example_json';
 import PlayerStats from './types/PlayerStats';
-// import Player from './types/Player';
+ import AllStatsPlayer from './types/AllStatsPlayer';
 import QuizPlayer from './types/QuizPlayer';
 import removeAbbrevName from './utils/removeAbbrevName';
 import randomStatRemove from './utils/randomStatRemove';
@@ -35,7 +35,7 @@ function App() {
     // getData();
   }, []);
 
-  let allPlayers: any[] = example_json['response'].map(
+  let allPlayers: AllStatsPlayer[] = example_json['response'].map(
     // player array
     (el: PlayerStats, index: number) => {
       const playerMap = new Map();
