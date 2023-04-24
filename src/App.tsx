@@ -1,7 +1,7 @@
 import { ReactEventHandler, useEffect, useState } from 'react';
 import example_json from './assets/example_json';
 import PlayerStats from './types/PlayerStats';
- import AllStatsPlayer from './types/AllStatsPlayer';
+import AllStatsPlayer from './types/AllStatsPlayer';
 import QuizPlayer from './types/QuizPlayer';
 import removeAbbrevName from './utils/removeAbbrevName';
 import randomStatRemove from './utils/randomStatRemove';
@@ -9,7 +9,7 @@ import UserAnswers from './types/UserAnswers';
 import { cloneDeep } from 'lodash';
 
 function App() {
-  const [scorers, setScorers] = useState<any>([]);
+  const [scorers, setScorers] = useState<AllStatsPlayer[]>([]);
   const [statRemove, setStatRemove] = useState<any>([]);
   const [userAnswers, setUserAnswers] = useState<Map<any, any>>(new Map());
 
@@ -35,7 +35,7 @@ function App() {
     // getData();
   }, []);
 
-  let allPlayers: AllStatsPlayer[] = example_json['response'].map(
+  let allStatsPlayer: AllStatsPlayer[] = example_json['response'].map(
     // player array
     (el: PlayerStats, index: number) => {
       const playerMap = new Map();
@@ -51,37 +51,40 @@ function App() {
     }
   );
 
-  console.log(allPlayers);
+  console.log(allStatsPlayer);
 
   useEffect(() => {
-    setScorers(allPlayers);
-    localStorage.setItem('players', JSON.stringify(allPlayers));
+    setScorers(allStatsPlayer);
+    localStorage.setItem('allStatsPlayers', JSON.stringify(allStatsPlayer));
   }, []);
 
-  function statRemover(players: any[]) {
-    const playersClone: any[] = cloneDeep(players);
+  function statRemover(allStatsPlayers: AllStatsPlayer[]) {
+    const allStatsPlayersClone: AllStatsPlayer[] = cloneDeep(allStatsPlayers); // have to clone so that I preserve answers and then can remove some answers from another reference object (shallow clone messes it up)
 
-    const quizPlayers: any[] = playersClone.map((el) => {
-      const keyIterator = el.keys();
+    const removedStatsPlayers: AllStatsPlayer[] = allStatsPlayersClone.map((el) => {
+      const keyIterator = el.keys(); // had to extend AllStatsPlayer interface to Map to allow use of keys()
       const key = keyIterator.next().value;
       console.log(key);
 
-      const statsToRemove = ['nationality', 'team', 'goals'];
+      const statsToRemove = ['nationality', 'team', 'goals']; // could be randomiser function
       const randomIndex = Math.floor(Math.random() * 3);
       const randomKey = statsToRemove[randomIndex];
 
-      el.get(key)[randomKey] =
-        typeof el.get(key)[randomKey] === 'string' ? '' : 0;
-      el.get(key).name = ''; // always remove name
+      if (el.get(key) !== undefined) { // check that the player value is not undefined, better safety
+        // Non-null expression You can postfix an expression with ! to tell TypeScript that you know it's not null or undefined. This works the same as an 'as' assertion.
+        el.get(key)![randomKey] =
+          typeof el.get(key)![randomKey] === 'string' ? '' : 0;
+        el.get(key)!.name = ''; // always remove name
+      }
       return el;
     });
-    return quizPlayers;
+    return removedStatsPlayers;
   }
 
-  const quizPlayers = statRemover(allPlayers);
+  const removedStatsPlayers = statRemover(allStatsPlayer);
 
-  console.log(quizPlayers);
-  console.log(allPlayers);
+  console.log(removedStatsPlayers);
+  console.log(allStatsPlayer);
 
   function handleSubmit(e: any) {
     e.preventDefault();
@@ -137,7 +140,7 @@ function App() {
         }
         return acc;
       }, null);
-      console.log(scorersCheck)
+      console.log(scorersCheck);
 
       console.log(userAnswers.get(key).hasOwnProperty('nationality'));
       console.log(userAnswers.get(key).hasOwnProperty('team'));
@@ -145,7 +148,7 @@ function App() {
 
       if (userAnswers.get(key).hasOwnProperty('nationality')) {
         console.log('found nationality');
-        console.log(userAnswers.get(key).nationality)
+        console.log(userAnswers.get(key).nationality);
         if (scorersCheck.nationality === userAnswers.get(key).nationality) {
           console.log('match');
           player.get(key).nationality = userAnswers.get(key).nationality;
@@ -184,7 +187,7 @@ function App() {
 
   return (
     <div className='App'>
-      <button onClick={() => setStatRemove(quizPlayers)}>see data</button>
+      <button onClick={() => setStatRemove(removedStatsPlayers)}>see data</button>
       <div className='bg-red-600 flex-col'>
         <form onSubmit={handleSubmit}>
           {statRemove.map((player: any, i: any) => {
