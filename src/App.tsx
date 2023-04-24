@@ -59,7 +59,7 @@ function App() {
   }, []);
 
   function statRemover(allStatsPlayers: AllStatsPlayer[]) {
-    const allStatsPlayersClone: AllStatsPlayer[] = cloneDeep(allStatsPlayers); // have to clone so that I preserve answers and then can remove some answers from another reference object (shallow clone messes it up)
+    const allStatsPlayersClone: AllStatsPlayer[] = cloneDeep(allStatsPlayers); // have to clone so that I preserve answers and allow removal of some answers from a distinct reference object (shallow clone could  mess it up as value is object {}, deep clone to be safe)
 
     const removedStatsPlayers: AllStatsPlayer[] = allStatsPlayersClone.map((el) => {
       const keyIterator = el.keys(); // had to extend AllStatsPlayer interface to Map to allow use of keys()
@@ -94,20 +94,21 @@ function App() {
 
     for (const [nameId, value] of formData.entries()) {
       console.log(nameId, value);
-      const [name, id] = nameId.split('-');
-      console.log(Number(id), name, value);
+      const [name, idStr] = nameId.split('-');
+      const id = Number(idStr); // values coming from form are always strings, convert to number to avoid type errors
+      console.log(id, name, value);
 
-      if (!userAnswersMap.has(Number(id))) {
-        userAnswersMap.set(Number(id), {
+      if (!userAnswersMap.has(id)) {
+        userAnswersMap.set(id, {
           [name]: value,
         });
       } else {
-        const answerObject = userAnswersMap.get(Number(id));
+        const answerObject = userAnswersMap.get(id);
         const updatedAnswerObject = {
           ...answerObject,
           [name]: value,
         };
-        userAnswersMap.set(Number(id), updatedAnswerObject);
+        userAnswersMap.set(id, updatedAnswerObject);
       }
     }
 
