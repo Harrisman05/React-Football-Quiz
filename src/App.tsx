@@ -66,14 +66,13 @@ function App() {
       const key = keyIterator.next().value;
       console.log(key);
 
-      const statsToRemove = ['nationality', 'team', 'goals']; // could be randomiser function
-      const randomIndex = Math.floor(Math.random() * 3);
+      const statsToRemove = ['nationality', 'team']; // could be randomiser function
+      const randomIndex = Math.floor(Math.random() * 2);
       const randomKey = statsToRemove[randomIndex];
 
       if (el.get(key) !== undefined) { // check that the player value is not undefined, better safety
         // Non-null expression You can postfix an expression with ! to tell TypeScript that you know it's not null or undefined. This works the same as an 'as' assertion.
-        el.get(key)![randomKey] =
-          typeof el.get(key)![randomKey] === 'string' ? '' : 0;
+        el.get(key)![randomKey] = ''
         el.get(key)!.name = ''; // always remove name
       }
       return el;
@@ -98,7 +97,7 @@ function App() {
       const id = Number(idStr); // values coming from form are always strings, convert to number to avoid type errors
       console.log(id, name, value);
 
-      if (!userAnswersMap.has(id)) {
+      if (!userAnswersMap.has(id)) { // set if as a key on the user answer map
         userAnswersMap.set(id, {
           [name]: value,
         });
@@ -191,7 +190,7 @@ function App() {
       <button onClick={() => setStatRemove(removedStatsPlayers)}>see data</button>
       <div className='bg-red-600 flex-col'>
         <form onSubmit={handleSubmit}>
-          {statRemove.map((player: any, i: any) => {
+          {statRemove.map((player: any) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
             return (
               <div key={id.toString()} className='flex gap-8'>
