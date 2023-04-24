@@ -35,7 +35,8 @@ function App() {
     // getData();
   }, []);
 
-  let allPlayers: any[] = example_json['response'].map( // player array
+  let allPlayers: any[] = example_json['response'].map(
+    // player array
     (el: PlayerStats, index: number) => {
       const playerMap = new Map();
       return playerMap.set(el.player.id, {
@@ -58,18 +59,19 @@ function App() {
   }, []);
 
   function statRemover(players: any[]) {
-    const playersClone: any[] = cloneDeep(players)
-    
+    const playersClone: any[] = cloneDeep(players);
+
     const quizPlayers: any[] = playersClone.map((el) => {
-      const keyIterator = el.keys()
-      const key = keyIterator.next().value
+      const keyIterator = el.keys();
+      const key = keyIterator.next().value;
       console.log(key);
 
       const statsToRemove = ['nationality', 'team', 'goals'];
       const randomIndex = Math.floor(Math.random() * 3);
       const randomKey = statsToRemove[randomIndex];
 
-      el.get(key)[randomKey] = typeof el.get(key)[randomKey] === 'string' ? '' : 0;
+      el.get(key)[randomKey] =
+        typeof el.get(key)[randomKey] === 'string' ? '' : 0;
       el.get(key).name = ''; // always remove name
       return el;
     });
@@ -108,8 +110,13 @@ function App() {
 
     console.log(userAnswersMap);
     setUserAnswers(userAnswersMap);
-    checkAnswers();
   }
+
+  useEffect(() => {
+    if (userAnswers) {
+      checkAnswers();
+    }
+  }, [userAnswers]);
 
   function checkAnswers() {
     console.log(scorers);
@@ -117,8 +124,8 @@ function App() {
     console.log(statRemoveClone);
 
     for (let player of statRemoveClone) {
-      const keyIterator = player.keys()
-      const key = Number(keyIterator.next().value)
+      const keyIterator = player.keys();
+      const key = Number(keyIterator.next().value);
       console.log(key);
       console.log(player.get(key));
       console.log(userAnswers.get(key));
@@ -126,39 +133,43 @@ function App() {
 
       const scorersCheck = scorers.reduce((acc: any, item: any) => {
         if (item.get(key)) {
-          acc = item.get(key)
+          acc = item.get(key);
         }
-        return acc
-      }, null )
+        return acc;
+      }, null);
+      console.log(scorersCheck)
 
-      console.log(userAnswers.get(key).nationality);
-      console.log(userAnswers.get(key).team);
-      console.log(userAnswers.get(key).goals);
+      console.log(userAnswers.get(key).hasOwnProperty('nationality'));
+      console.log(userAnswers.get(key).hasOwnProperty('team'));
+      console.log(userAnswers.get(key).hasOwnProperty('goals'));
 
-      if (userAnswers.get(key).nationality) {
+      if (userAnswers.get(key).hasOwnProperty('nationality')) {
         console.log('found nationality');
+        console.log(userAnswers.get(key).nationality)
         if (scorersCheck.nationality === userAnswers.get(key).nationality) {
           console.log('match');
-          player.get(key).nationality = userAnswers.get(key).nationality; 
+          player.get(key).nationality = userAnswers.get(key).nationality;
         }
       }
 
-      if (userAnswers.get(key).team) {
+      if (userAnswers.get(key).hasOwnProperty('team')) {
         console.log('found team');
         if (scorersCheck.team === userAnswers.get(key).team) {
           console.log('match');
-          player.get(key).team = userAnswers.get(key).team; 
+          player.get(key).team = userAnswers.get(key).team;
         }
       }
 
-      if (userAnswers.get(key).goals) {
+      if (userAnswers.get(key).hasOwnProperty('goals')) {
         console.log('found goals');
-        if (scorersCheck.team === userAnswers.get(key).goals) {
+        if (scorersCheck.goals === Number(userAnswers.get(key).goals)) {
           console.log('match');
-          player.get(key).team = userAnswers.get(key).goals; 
+          player.get(key).goals = Number(userAnswers.get(key).goals);
         }
       }
     }
+
+    setStatRemove(statRemoveClone);
   }
 
   useEffect(() => {
@@ -175,16 +186,13 @@ function App() {
     <div className='App'>
       <button onClick={() => setStatRemove(quizPlayers)}>see data</button>
       <div className='bg-red-600 flex-col'>
-        <form onSubmit={handleSubmit}> 
+        <form onSubmit={handleSubmit}>
           {statRemove.map((player: any, i: any) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
             return (
               <div key={id.toString()} className='flex gap-8'>
                 {stats.name === '' ? (
-                    <input
-                      name={`name-${id}`}
-                      className='w-40 bg-slate-400'
-                    />
+                  <input name={`name-${id}`} className='w-40 bg-slate-400' />
                 ) : (
                   <div className='w-40 flex items-center border-s-blue-900'>
                     {stats.name}
