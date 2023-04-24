@@ -2,11 +2,13 @@ import { ReactEventHandler, useEffect, useState } from 'react';
 import example_json from './assets/example_json';
 import PlayerStats from './types/PlayerStats';
 import AllStatsPlayer from './types/AllStatsPlayer';
+import ModifiedStatsPlayer from './types/ModifiedStatsPlayer';
 import QuizPlayer from './types/QuizPlayer';
 import removeAbbrevName from './utils/removeAbbrevName';
 import randomStatRemove from './utils/randomStatRemove';
 import UserAnswers from './types/UserAnswers';
 import { cloneDeep } from 'lodash';
+
 
 function App() {
   const [scorers, setScorers] = useState<AllStatsPlayer[]>([]);
@@ -59,9 +61,9 @@ function App() {
   }, []);
 
   function statRemover(allStatsPlayers: AllStatsPlayer[]) {
-    const allStatsPlayersClone: AllStatsPlayer[] = cloneDeep(allStatsPlayers); // have to clone so that I preserve answers and allow removal of some answers from a distinct reference object (shallow clone could  mess it up as value is object {}, deep clone to be safe)
+    const allStatsPlayersClone = cloneDeep(allStatsPlayers) as ModifiedStatsPlayer[] // have to clone so that I preserve answers and allow removal of some answers from a distinct reference object (shallow clone could  mess it up as value is object {}, deep clone to be safe). Use type assertation to convert type as compiler can't figure this out on it's own
 
-    const removedStatsPlayers: AllStatsPlayer[] = allStatsPlayersClone.map(
+    const removedStatsPlayers: ModifiedStatsPlayer[] = allStatsPlayersClone.map( // now switching type to allow empty string literals 
       (el) => {
         const keyIterator = el.keys(); // had to extend AllStatsPlayer interface to Map to allow use of keys()
         const key = keyIterator.next().value;
@@ -82,8 +84,7 @@ function App() {
     );
     return removedStatsPlayers;
   }
-
-  const removedStatsPlayers = statRemover(allStatsPlayer);
+  const removedStatsPlayers = statRemover(allStatsPlayer)
 
   console.log(removedStatsPlayers);
   console.log(allStatsPlayer);
