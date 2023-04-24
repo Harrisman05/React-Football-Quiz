@@ -12,7 +12,7 @@ import { cloneDeep } from 'lodash';
 
 function App() {
   const [scorers, setScorers] = useState<AllStatsPlayer[]>([]);
-  const [statRemove, setStatRemove] = useState<any>([]);
+  const [statRemove, setStatRemove] = useState<ModifiedStatsPlayer[]>([]);
   const [userAnswers, setUserAnswers] = useState<Map<any, any>>(new Map());
 
   useEffect(() => {
@@ -93,7 +93,7 @@ function App() {
     e.preventDefault();
     const form = e.target;
     const formData = new FormData(form);
-    const userAnswersMap = new Map();
+    const userAnswersMap: UserAnswers = new Map();
 
     for (const [nameId, value] of formData.entries()) {
       console.log(nameId, value);
@@ -102,7 +102,7 @@ function App() {
       console.log(id, name, value);
 
       if (!userAnswersMap.has(id)) {
-        // set if as a key on the user answer map
+        // set id as a key on the user answer map if it doesn't exist
         userAnswersMap.set(id, {
           [name]: value,
         });
@@ -156,7 +156,7 @@ function App() {
         console.log(userAnswers.get(key).nationality);
         if (scorersCheck.nationality === userAnswers.get(key).nationality) {
           console.log('match');
-          player.get(key).nationality = userAnswers.get(key).nationality;
+          player.get(key)!.nationality = userAnswers.get(key).nationality;
         }
       }
 
@@ -164,7 +164,7 @@ function App() {
         console.log('found team');
         if (scorersCheck.team === userAnswers.get(key).team) {
           console.log('match');
-          player.get(key).team = userAnswers.get(key).team;
+          player.get(key)!.team = userAnswers.get(key).team;
         }
       }
 
@@ -172,7 +172,7 @@ function App() {
         console.log('found goals');
         if (scorersCheck.goals === Number(userAnswers.get(key).goals)) {
           console.log('match');
-          player.get(key).goals = Number(userAnswers.get(key).goals);
+          player.get(key)!.goals = Number(userAnswers.get(key).goals);
         }
       }
     }
@@ -193,11 +193,11 @@ function App() {
   return (
     <div className='App'>
       <button onClick={() => setStatRemove(removedStatsPlayers)}>
-        see data
+        Remove stats
       </button>
       <div className='bg-red-600 flex-col'>
         <form onSubmit={handleSubmit}>
-          {statRemove.map((player: any) => {
+          {statRemove.map((player: ModifiedStatsPlayer) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
             return (
               <div key={id.toString()} className='flex gap-8'>
