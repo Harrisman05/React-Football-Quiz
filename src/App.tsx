@@ -36,7 +36,7 @@ function App() {
     // getData();
   }, []);
 
-  let allStatsPlayer: AllStatsPlayer[] = example_json['response'].map(
+  const allStatsPlayer: AllStatsPlayer[] = example_json['response'].map(
     // player array
     (el: PlayerStats, index: number) => {
       const playerMap = new Map();
@@ -56,7 +56,9 @@ function App() {
 
   useEffect(() => {
     setScorers(allStatsPlayer);
-    localStorage.setItem('allStatsPlayers', JSON.stringify(allStatsPlayer));
+    // Maps are not valid JSON, so convert each map into object first before stringifying
+    const stringifiedMap = JSON.stringify(allStatsPlayers.map((map) => Object.fromEntries(map)));
+    localStorage.setItem('allStatsPlayers', JSON.stringify(stringifiedMap));
   }, []);
 
   function statRemover(allStatsPlayers: AllStatsPlayer[]) {
@@ -159,6 +161,17 @@ function App() {
       console.log(userAnswerPlayer?.hasOwnProperty('goals'));
 
       if (
+        userAnswerPlayer?.hasOwnProperty('name') &&
+        userAnswerPlayer.name !== undefined
+      ) {
+        console.log('found name');
+        if (allStatPlayer.name === userAnswerPlayer.name) {
+          console.log('match');
+          removedStatPlayer!.name = userAnswerPlayer.name;
+        }
+      }
+
+      if (
         userAnswerPlayer?.hasOwnProperty('nationality') &&
         userAnswerPlayer.nationality !== undefined
       ) {
@@ -178,17 +191,6 @@ function App() {
         if (allStatPlayer.team === userAnswerPlayer.team) {
           console.log('match');
           removedStatPlayer!.team = userAnswerPlayer.team;
-        }
-      }
-
-      if (
-        userAnswerPlayer?.hasOwnProperty('goals') &&
-        Number(userAnswerPlayer.goals) !== undefined
-      ) {
-        console.log('found goals');
-        if (allStatPlayer.goals === Number(userAnswerPlayer.goals)) {
-          console.log('match');
-          removedStatPlayer!.goals = Number(userAnswerPlayer.goals);
         }
       }
     }

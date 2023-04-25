@@ -5,8 +5,8 @@ export default interface UserAnswers
     number,
     {
         [key: string]: FormDataEntryValue | undefined
-        name?: '';
-        nationality?: string | '';
-        team?: string | '';
+        name?: '' | undefined;
+        nationality?: string | '' | undefined;
+        team?: string | '' | undefined;
     }
   > {}
