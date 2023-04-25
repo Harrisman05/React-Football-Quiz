@@ -9,11 +9,10 @@ import randomStatRemove from './utils/randomStatRemove';
 import UserAnswers from './types/UserAnswers';
 import { cloneDeep } from 'lodash';
 
-
 function App() {
-  const [scorers, setScorers] = useState<AllStatsPlayer[]>([]);
+  const [allStatsPlayers, setScorers] = useState<AllStatsPlayer[]>([]);
   const [statRemove, setStatRemove] = useState<ModifiedStatsPlayer[]>([]);
-  const [userAnswers, setUserAnswers] = useState<Map<any, any>>(new Map());
+  const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
 
   useEffect(() => {
     const getData = async () => {
@@ -61,9 +60,12 @@ function App() {
   }, []);
 
   function statRemover(allStatsPlayers: AllStatsPlayer[]) {
-    const allStatsPlayersClone = cloneDeep(allStatsPlayers) as ModifiedStatsPlayer[] // have to clone so that I preserve answers and allow removal of some answers from a distinct reference object (shallow clone could  mess it up as value is object {}, deep clone to be safe). Use type assertation to convert type as compiler can't figure this out on it's own
+    const allStatsPlayersClone = cloneDeep(
+      allStatsPlayers
+    ) as ModifiedStatsPlayer[]; // have to clone so that I preserve answers and allow removal of some answers from a distinct reference object (shallow clone could  mess it up as value is object {}, deep clone to be safe). Use type assertation to convert type as compiler can't figure this out on it's own
 
-    const removedStatsPlayers: ModifiedStatsPlayer[] = allStatsPlayersClone.map( // now switching type to allow empty string literals 
+    const removedStatsPlayers: ModifiedStatsPlayer[] = allStatsPlayersClone.map(
+      // now switching type to allow empty string literals
       (el) => {
         const keyIterator = el.keys(); // had to extend AllStatsPlayer interface to Map to allow use of keys()
         const key = keyIterator.next().value;
@@ -84,7 +86,7 @@ function App() {
     );
     return removedStatsPlayers;
   }
-  const removedStatsPlayers = statRemover(allStatsPlayer)
+  const removedStatsPlayers = statRemover(allStatsPlayer);
 
   console.log(removedStatsPlayers);
   console.log(allStatsPlayer);
@@ -116,7 +118,7 @@ function App() {
       }
     }
 
-    console.log(userAnswersMap);
+    console.log(typeof userAnswersMap);
     setUserAnswers(userAnswersMap);
   }
 
@@ -127,57 +129,71 @@ function App() {
   }, [userAnswers]);
 
   function checkAnswers() {
-    console.log(scorers);
-    const statRemoveClone = [...statRemove];
-    console.log(statRemoveClone);
+    console.log(allStatsPlayers);
 
-    for (let player of statRemoveClone) {
+    for (let player of statRemove) {
+      // extract keys to start extracting players from all the map
       const keyIterator = player.keys();
       const key = Number(keyIterator.next().value);
       console.log(key);
-      console.log(player.get(key));
-      console.log(userAnswers.get(key));
-      console.log(scorers);
 
-      const scorersCheck = scorers.reduce((acc: any, item: any) => {
+      // Using key, extract data of player for user answers, removed stats and all stats
+      const userAnswerPlayer = userAnswers.get(key);
+      const removedStatPlayer = player.get(key);
+      const allStatPlayer = allStatsPlayers.reduce((acc: any, item: any) => {
         if (item.get(key)) {
           acc = item.get(key);
         }
         return acc;
       }, null);
-      console.log(scorersCheck);
 
-      console.log(userAnswers.get(key).hasOwnProperty('nationality'));
-      console.log(userAnswers.get(key).hasOwnProperty('team'));
-      console.log(userAnswers.get(key).hasOwnProperty('goals'));
+      console.log(removedStatPlayer);
+      console.log(userAnswerPlayer);
+      console.log(allStatsPlayers);
+      console.log(allStatPlayer);
 
-      if (userAnswers.get(key).hasOwnProperty('nationality')) {
+      // extract player from allStatsPlayer map using current key iteration
+
+      console.log(userAnswerPlayer?.hasOwnProperty('nationality'));
+      console.log(userAnswerPlayer?.hasOwnProperty('team'));
+      console.log(userAnswerPlayer?.hasOwnProperty('goals'));
+
+      if (
+        userAnswerPlayer?.hasOwnProperty('nationality') &&
+        userAnswerPlayer.nationality !== undefined
+      ) {
         console.log('found nationality');
-        console.log(userAnswers.get(key).nationality);
-        if (scorersCheck.nationality === userAnswers.get(key).nationality) {
+        console.log(userAnswerPlayer.nationality);
+        if (allStatPlayer.nationality === userAnswerPlayer.nationality) {
           console.log('match');
-          player.get(key)!.nationality = userAnswers.get(key).nationality;
+          removedStatPlayer!.nationality = userAnswerPlayer.nationality;
         }
       }
 
-      if (userAnswers.get(key).hasOwnProperty('team')) {
+      if (
+        userAnswerPlayer?.hasOwnProperty('team') &&
+        userAnswerPlayer.team !== undefined
+      ) {
         console.log('found team');
-        if (scorersCheck.team === userAnswers.get(key).team) {
+        if (allStatPlayer.team === userAnswerPlayer.team) {
           console.log('match');
-          player.get(key)!.team = userAnswers.get(key).team;
+          removedStatPlayer!.team = userAnswerPlayer.team;
         }
       }
 
-      if (userAnswers.get(key).hasOwnProperty('goals')) {
+      if (
+        userAnswerPlayer?.hasOwnProperty('goals') &&
+        Number(userAnswerPlayer.goals) !== undefined
+      ) {
         console.log('found goals');
-        if (scorersCheck.goals === Number(userAnswers.get(key).goals)) {
+        if (allStatPlayer.goals === Number(userAnswerPlayer.goals)) {
           console.log('match');
-          player.get(key)!.goals = Number(userAnswers.get(key).goals);
+          removedStatPlayer!.goals = Number(userAnswerPlayer.goals);
         }
       }
     }
 
-    setStatRemove(statRemoveClone);
+    setStatRemove([...statRemove]); // updating statRemove to fill in gaps if answer is right. No need to clone deep as original state doesn't need to be preserved
   }
 
   useEffect(() => {
