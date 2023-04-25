@@ -1,17 +1,17 @@
 import { ReactEventHandler, useEffect, useState } from 'react';
 import example_json from './assets/example_json';
 import PlayerStats from './types/PlayerStats';
-// import Player from './types/Player';
-import QuizPlayer from './types/QuizPlayer';
+import AllStatsPlayer from './types/AllStatsPlayer';
+import AllStatPlayerReduce from './types/AllStatPlayerReduce';
+import ModifiedStatsPlayer from './types/ModifiedStatsPlayer';
 import removeAbbrevName from './utils/removeAbbrevName';
-import randomStatRemove from './utils/randomStatRemove';
 import UserAnswers from './types/UserAnswers';
 import { cloneDeep } from 'lodash';
 
 function App() {
-  const [scorers, setScorers] = useState<any>([]);
-  const [statRemove, setStatRemove] = useState<any>([]);
-  const [userAnswers, setUserAnswers] = useState<Map<any, any>>(new Map());
+  const [allStatsPlayers, setScorers] = useState<AllStatsPlayer[]>([]);
+  const [statRemove, setStatRemove] = useState<ModifiedStatsPlayer[]>([]);
+  const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
 
   useEffect(() => {
     const getData = async () => {
@@ -35,7 +35,7 @@ function App() {
     // getData();
   }, []);
 
-  let allPlayers: any[] = example_json['response'].map(
+  const allStatsPlayer: AllStatsPlayer[] = example_json['response'].map(
     // player array
     (el: PlayerStats, index: number) => {
       const playerMap = new Map();
@@ -51,65 +51,79 @@ function App() {
     }
   );
 
-  console.log(allPlayers);
+  console.log(allStatsPlayer);
 
   useEffect(() => {
-    setScorers(allPlayers);
-    localStorage.setItem('players', JSON.stringify(allPlayers));
+    setScorers(allStatsPlayer);
+    // Maps are not valid JSON, so convert each map into object first before stringifying
+    const stringifiedMap = JSON.stringify(
+      allStatsPlayers.map((map) => Object.fromEntries(map))
+    );
+    localStorage.setItem('allStatsPlayers', JSON.stringify(stringifiedMap));
   }, []);
 
-  function statRemover(players: any[]) {
-    const playersClone: any[] = cloneDeep(players);
+  function statRemover(allStatsPlayers: AllStatsPlayer[]) {
+    const allStatsPlayersClone = cloneDeep(
+      allStatsPlayers
+    ) as ModifiedStatsPlayer[]; // have to clone so that I preserve answers and allow removal of some answers from a distinct reference object (shallow clone could  mess it up as value is object {}, deep clone to be safe). Use type assertation to convert type as compiler can't figure this out on it's own
 
-    const quizPlayers: any[] = playersClone.map((el) => {
-      const keyIterator = el.keys();
-      const key = keyIterator.next().value;
-      console.log(key);
+    const removedStatsPlayers: ModifiedStatsPlayer[] = allStatsPlayersClone.map(
+      // now switching type to allow empty string literals
+      (el) => {
+        const keyIterator = el.keys(); // had to extend AllStatsPlayer interface to Map to allow use of keys()
+        const key = keyIterator.next().value;
+        console.log(key);
 
-      const statsToRemove = ['nationality', 'team', 'goals'];
-      const randomIndex = Math.floor(Math.random() * 3);
-      const randomKey = statsToRemove[randomIndex];
+        const statsToRemove = ['nationality', 'team']; // could be randomiser function
+        const randomIndex = Math.floor(Math.random() * 2);
+        const randomKey = statsToRemove[randomIndex];
 
-      el.get(key)[randomKey] =
-        typeof el.get(key)[randomKey] === 'string' ? '' : 0;
-      el.get(key).name = ''; // always remove name
-      return el;
-    });
-    return quizPlayers;
+        if (el.get(key) !== undefined) {
+          // check that the player value is not undefined, better safety
+          // Non-null expression You can postfix an expression with ! to tell TypeScript that you know it's not null or undefined. This works the same as an 'as' assertion.
+          el.get(key)![randomKey] = '';
+          el.get(key)!.name = ''; // always remove name
+        }
+        return el;
+      }
+    );
+    return removedStatsPlayers;
   }
+  const removedStatsPlayers = statRemover(allStatsPlayer);
 
-  const quizPlayers = statRemover(allPlayers);
+  console.log(removedStatsPlayers);
+  console.log(allStatsPlayer);
 
-  console.log(quizPlayers);
-  console.log(allPlayers);
-
-  function handleSubmit(e: any) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.target;
+    const form = e.currentTarget; // currentTarget because event.target can be anything because of event bubbling - https://stackoverflow.com/questions/73819465/argument-of-type-eventtarget-is-not-assignable-to-parameter-of-type-htmlforme
+
     const formData = new FormData(form);
-    const userAnswersMap = new Map();
+    const userAnswers: UserAnswers = new Map();
 
     for (const [nameId, value] of formData.entries()) {
       console.log(nameId, value);
-      const [name, id] = nameId.split('-');
-      console.log(Number(id), name, value);
+      const [name, idStr] = nameId.split('-');
+      const id = Number(idStr); // values coming from form are always strings, convert to number to avoid type errors
+      console.log(id, name, value);
 
-      if (!userAnswersMap.has(Number(id))) {
-        userAnswersMap.set(Number(id), {
+      if (!userAnswers.has(id)) {
+        // set id as a key on the user answer map if it doesn't exist
+        userAnswers.set(id, {
           [name]: value,
         });
       } else {
-        const answerObject = userAnswersMap.get(Number(id));
-        const updatedAnswerObject = {
+        const answerObject = userAnswers.get(id);
+        const updatedAnswer = {
           ...answerObject,
           [name]: value,
         };
-        userAnswersMap.set(Number(id), updatedAnswerObject);
+        userAnswers.set(id, updatedAnswer);
       }
     }
 
-    console.log(userAnswersMap);
-    setUserAnswers(userAnswersMap);
+    console.log(typeof userAnswers);
+    setUserAnswers(userAnswers);
   }
 
   useEffect(() => {
@@ -119,57 +133,74 @@ function App() {
   }, [userAnswers]);
 
   function checkAnswers() {
-    console.log(scorers);
-    const statRemoveClone = [...statRemove];
-    console.log(statRemoveClone);
+    console.log(allStatsPlayers);
 
-    for (let player of statRemoveClone) {
+    for (let player of statRemove) {
+      // extract keys to start extracting players from all the map
       const keyIterator = player.keys();
       const key = Number(keyIterator.next().value);
       console.log(key);
-      console.log(player.get(key));
-      console.log(userAnswers.get(key));
-      console.log(scorers);
 
-      const scorersCheck = scorers.reduce((acc: any, item: any) => {
-        if (item.get(key)) {
-          acc = item.get(key);
+      // Using key, extract data of player for user answers, removed stats and all stats
+      const userAnswerPlayer = userAnswers.get(key);
+      const removedStatPlayer = player.get(key);
+      const allStatPlayer = allStatsPlayers.reduce(
+        (acc: AllStatPlayerReduce | undefined, el: AllStatsPlayer) => {
+          if (el.get(key)) {
+            acc = el.get(key);
+          }
+          return acc;
+        },
+        undefined
+      );
+
+      console.log(removedStatPlayer);
+      console.log(userAnswerPlayer);
+      console.log(allStatsPlayers);
+      console.log(allStatPlayer);
+
+      // extract player from allStatsPlayer map using current key iteration
+
+      console.log(userAnswerPlayer?.hasOwnProperty('nationality'));
+      console.log(userAnswerPlayer?.hasOwnProperty('team'));
+      console.log(userAnswerPlayer?.hasOwnProperty('goals'));
+
+      if (
+        userAnswerPlayer?.hasOwnProperty('name') &&
+        userAnswerPlayer.name !== undefined
+      ) {
+        console.log('found name');
+        if (allStatPlayer!.name === userAnswerPlayer.name) {
+          console.log('match');
+          removedStatPlayer!.name = userAnswerPlayer.name;
         }
-        return acc;
-      }, null);
-      console.log(scorersCheck)
+      }
 
-      console.log(userAnswers.get(key).hasOwnProperty('nationality'));
-      console.log(userAnswers.get(key).hasOwnProperty('team'));
-      console.log(userAnswers.get(key).hasOwnProperty('goals'));
-
-      if (userAnswers.get(key).hasOwnProperty('nationality')) {
+      if (
+        userAnswerPlayer?.hasOwnProperty('nationality') &&
+        userAnswerPlayer.nationality !== undefined
+      ) {
         console.log('found nationality');
-        console.log(userAnswers.get(key).nationality)
-        if (scorersCheck.nationality === userAnswers.get(key).nationality) {
+        console.log(userAnswerPlayer.nationality);
+        if (allStatPlayer!.nationality === userAnswerPlayer.nationality) {
           console.log('match');
-          player.get(key).nationality = userAnswers.get(key).nationality;
+          removedStatPlayer!.nationality = userAnswerPlayer.nationality;
         }
       }
 
-      if (userAnswers.get(key).hasOwnProperty('team')) {
+      if (
+        userAnswerPlayer?.hasOwnProperty('team') &&
+        userAnswerPlayer.team !== undefined
+      ) {
         console.log('found team');
-        if (scorersCheck.team === userAnswers.get(key).team) {
+        if (allStatPlayer!.team === userAnswerPlayer.team) {
           console.log('match');
-          player.get(key).team = userAnswers.get(key).team;
-        }
-      }
-
-      if (userAnswers.get(key).hasOwnProperty('goals')) {
-        console.log('found goals');
-        if (scorersCheck.goals === Number(userAnswers.get(key).goals)) {
-          console.log('match');
-          player.get(key).goals = Number(userAnswers.get(key).goals);
+          removedStatPlayer!.team = userAnswerPlayer.team;
         }
       }
     }
 
-    setStatRemove(statRemoveClone);
+    setStatRemove([...statRemove]); // updating statRemove to fill in gaps if answer is right. No need to clone deep as original state doesn't need to be preserved
   }
 
   useEffect(() => {
@@ -184,13 +215,16 @@ function App() {
 
   return (
     <div className='App'>
-      <button onClick={() => setStatRemove(quizPlayers)}>see data</button>
+      <button onClick={() => setStatRemove(removedStatsPlayers)}>
+        Remove stats
+      </button>
       <div className='bg-red-600 flex-col'>
         <form onSubmit={handleSubmit}>
-          {statRemove.map((player: any, i: any) => {
+          {statRemove.map((player: ModifiedStatsPlayer) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
             return (
               <div key={id.toString()} className='flex gap-8'>
+                <div className='w-40 flex items-center'>{stats.ranking}</div>
                 {stats.name === '' ? (
                   <input name={`name-${id}`} className='w-40 bg-slate-400' />
                 ) : (
