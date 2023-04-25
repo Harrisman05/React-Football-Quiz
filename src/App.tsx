@@ -93,11 +93,11 @@ function App() {
   console.log(removedStatsPlayers);
   console.log(allStatsPlayer);
 
-  function handleSubmit(e: any) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.target;
+    const form = e.currentTarget; // currentTarget because event.target can be anything because of event bubbling - https://stackoverflow.com/questions/73819465/argument-of-type-eventtarget-is-not-assignable-to-parameter-of-type-htmlforme
     const formData = new FormData(form);
-    const userAnswersMap: UserAnswers = new Map();
+    const userAnswers: UserAnswers = new Map();
 
     for (const [nameId, value] of formData.entries()) {
       console.log(nameId, value);
@@ -105,23 +105,23 @@ function App() {
       const id = Number(idStr); // values coming from form are always strings, convert to number to avoid type errors
       console.log(id, name, value);
 
-      if (!userAnswersMap.has(id)) {
+      if (!userAnswers.has(id)) {
         // set id as a key on the user answer map if it doesn't exist
-        userAnswersMap.set(id, {
+        userAnswers.set(id, {
           [name]: value,
         });
       } else {
-        const answerObject = userAnswersMap.get(id);
-        const updatedAnswerObject = {
+        const answerObject = userAnswers.get(id);
+        const updatedAnswer = {
           ...answerObject,
           [name]: value,
         };
-        userAnswersMap.set(id, updatedAnswerObject);
+        userAnswers.set(id, updatedAnswer);
       }
     }
 
-    console.log(typeof userAnswersMap);
-    setUserAnswers(userAnswersMap);
+    console.log(typeof userAnswers);
+    setUserAnswers(userAnswers);
   }
 
   useEffect(() => {
