@@ -2,10 +2,9 @@ import { ReactEventHandler, useEffect, useState } from 'react';
 import example_json from './assets/example_json';
 import PlayerStats from './types/PlayerStats';
 import AllStatsPlayer from './types/AllStatsPlayer';
+import AllStatPlayerReduce from './types/AllStatPlayerReduce';
 import ModifiedStatsPlayer from './types/ModifiedStatsPlayer';
-import QuizPlayer from './types/QuizPlayer';
 import removeAbbrevName from './utils/removeAbbrevName';
-import randomStatRemove from './utils/randomStatRemove';
 import UserAnswers from './types/UserAnswers';
 import { cloneDeep } from 'lodash';
 
@@ -57,7 +56,9 @@ function App() {
   useEffect(() => {
     setScorers(allStatsPlayer);
     // Maps are not valid JSON, so convert each map into object first before stringifying
-    const stringifiedMap = JSON.stringify(allStatsPlayers.map((map) => Object.fromEntries(map)));
+    const stringifiedMap = JSON.stringify(
+      allStatsPlayers.map((map) => Object.fromEntries(map))
+    );
     localStorage.setItem('allStatsPlayers', JSON.stringify(stringifiedMap));
   }, []);
 
@@ -96,6 +97,7 @@ function App() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget; // currentTarget because event.target can be anything because of event bubbling - https://stackoverflow.com/questions/73819465/argument-of-type-eventtarget-is-not-assignable-to-parameter-of-type-htmlforme
+
     const formData = new FormData(form);
     const userAnswers: UserAnswers = new Map();
 
@@ -142,12 +144,15 @@ function App() {
       // Using key, extract data of player for user answers, removed stats and all stats
       const userAnswerPlayer = userAnswers.get(key);
       const removedStatPlayer = player.get(key);
-      const allStatPlayer = allStatsPlayers.reduce((acc: any, item: any) => {
-        if (item.get(key)) {
-          acc = item.get(key);
-        }
-        return acc;
-      }, null);
+      const allStatPlayer = allStatsPlayers.reduce(
+        (acc: AllStatPlayerReduce | undefined, el: AllStatsPlayer) => {
+          if (el.get(key)) {
+            acc = el.get(key);
+          }
+          return acc;
+        },
+        undefined
+      );
 
       console.log(removedStatPlayer);
       console.log(userAnswerPlayer);
@@ -165,7 +170,7 @@ function App() {
         userAnswerPlayer.name !== undefined
       ) {
         console.log('found name');
-        if (allStatPlayer.name === userAnswerPlayer.name) {
+        if (allStatPlayer!.name === userAnswerPlayer.name) {
           console.log('match');
           removedStatPlayer!.name = userAnswerPlayer.name;
         }
@@ -177,7 +182,7 @@ function App() {
       ) {
         console.log('found nationality');
         console.log(userAnswerPlayer.nationality);
-        if (allStatPlayer.nationality === userAnswerPlayer.nationality) {
+        if (allStatPlayer!.nationality === userAnswerPlayer.nationality) {
           console.log('match');
           removedStatPlayer!.nationality = userAnswerPlayer.nationality;
         }
@@ -188,7 +193,7 @@ function App() {
         userAnswerPlayer.team !== undefined
       ) {
         console.log('found team');
-        if (allStatPlayer.team === userAnswerPlayer.team) {
+        if (allStatPlayer!.team === userAnswerPlayer.team) {
           console.log('match');
           removedStatPlayer!.team = userAnswerPlayer.team;
         }
