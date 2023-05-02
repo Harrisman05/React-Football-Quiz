@@ -13,6 +13,8 @@ function App() {
   const [statRemove, setStatRemove] = useState<ModifiedStatsPlayer[]>([]);
   const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
 
+  /* Run using API --------------------------------------------------------------------------------- */
+
   useEffect(() => {
     const getData = async () => {
       var options = {
@@ -30,10 +32,40 @@ function App() {
 
       const body = await response.text();
       const data = JSON.parse(body);
-      // console.log(data);
+
+      console.log(data);
+
+      const allStatsPlayer: AllStatsPlayer[] = data['response'].map(
+        // player array
+        (el: PlayerStats, index: number) => {
+          const playerMap = new Map();
+          return playerMap.set(el.player.id, {
+            name: removeAbbrevName(el.player.name),
+            firstname: el.player.firstname,
+            lastname: el.player.lastname,
+            nationality: el.player.nationality,
+            team: el.statistics[0].team.name,
+            ranking: index + 1, // index object comes in order, so use index to calculate ranking
+            goals: el.statistics[0].goals.total,
+          });
+        }
+      );
+
+      console.log(allStatsPlayer);
+
+      setScorers(allStatsPlayer);
+      // Maps are not valid JSON, so convert each map into object first before stringifying
+      const stringifiedMap = JSON.stringify(
+        allStatsPlayers.map((map) => Object.fromEntries(map))
+      );
+      localStorage.setItem('allStatsPlayers', JSON.stringify(stringifiedMap));
     };
     // getData();
   }, []);
+
+  /* Run using API ^^^-------------------------------------------------------------------------------*/
+
+  /* Run using local data -------------------------------------------------------------------------- */
 
   const allStatsPlayer: AllStatsPlayer[] = example_json['response'].map(
     // player array
@@ -62,6 +94,8 @@ function App() {
     localStorage.setItem('allStatsPlayers', JSON.stringify(stringifiedMap));
   }, []);
 
+  /* Run using local data ^^^ -------------------------------------------------------------------------- */
+
   function statRemover(allStatsPlayers: AllStatsPlayer[]) {
     const allStatsPlayersClone = cloneDeep(
       allStatsPlayers
@@ -89,10 +123,10 @@ function App() {
     );
     return removedStatsPlayers;
   }
-  const removedStatsPlayers = statRemover(allStatsPlayer);
+  const removedStatsPlayers = statRemover(allStatsPlayers);
 
   console.log(removedStatsPlayers);
-  console.log(allStatsPlayer);
+  console.log(allStatsPlayers);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -232,13 +266,11 @@ function App() {
                     {stats.nationality}
                   </div>
                 )}
-
                 {stats.team === '' ? (
                   <input name={`team-${id}`} className='w-40' />
                 ) : (
                   <div className='w-40 flex items-center'>{stats.team}</div>
                 )}
-
                 {stats.goals === 0 ? (
                   <input name={`goals-${id}`} className='w-40' />
                 ) : (
