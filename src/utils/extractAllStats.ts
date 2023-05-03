@@ -3,9 +3,11 @@ import PlayerStats from '../types/PlayerStats';
 import removeAbbrevName from './removeAbbrevName';
 
 export default function extractAllStats(jsonData: any): AllStatsPlayer[] {
-  // TO-DO -- add typing for API data + zod validation
+  /*
+  todo - add typing for API data + zod validation
+  */
+
   const allStatsPlayer: AllStatsPlayer[] = jsonData.map(
-    // player array
     (el: PlayerStats, index: number) => {
       const playerMap = new Map();
       return playerMap.set(el.player.id, {

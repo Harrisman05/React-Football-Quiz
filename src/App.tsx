@@ -8,9 +8,11 @@ import removeAbbrevName from './utils/removeAbbrevName';
 import UserAnswers from './types/UserAnswers';
 import { cloneDeep } from 'lodash';
 import extractAllStats from './utils/extractAllStats';
+import randomStatRemover from './utils/createRemovedStatsPlayers';
+import createRemovedStatsPlayers from './utils/createRemovedStatsPlayers';
 
 function App() {
-  const [allStatsPlayers, setScorers] = useState<AllStatsPlayer[]>([]);
+  const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
   const [statRemove, setStatRemove] = useState<ModifiedStatsPlayer[]>([]);
   const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
 
@@ -54,7 +56,7 @@ function App() {
 
       console.log(allStatsPlayer);
 
-      setScorers(allStatsPlayer);
+      setallStatsPlayers(allStatsPlayer);
       // Maps are not valid JSON, so convert each map into object first before stringifying
       const stringifiedMap = JSON.stringify(
         allStatsPlayers.map((map) => Object.fromEntries(map))
@@ -69,11 +71,10 @@ function App() {
   /* Run using local data -------------------------------------------------------------------------- */
 
   const allStatsPlayer: AllStatsPlayer[] = extractAllStats(example_json['response']);
-
   console.log(allStatsPlayer);
 
   useEffect(() => {
-    setScorers(allStatsPlayer);
+    setallStatsPlayers(allStatsPlayer);
     // Maps are not valid JSON, so convert each map into object first before stringifying
     const stringifiedMap = JSON.stringify(
       allStatsPlayers.map((map) => Object.fromEntries(map))
@@ -83,34 +84,8 @@ function App() {
 
   /* Run using local data ^^^ -------------------------------------------------------------------------- */
 
-  function statRemover(allStatsPlayers: AllStatsPlayer[]) {
-    const allStatsPlayersClone = cloneDeep(
-      allStatsPlayers
-    ) as ModifiedStatsPlayer[]; // have to clone so that I preserve answers and allow removal of some answers from a distinct reference object (shallow clone could  mess it up as value is object {}, deep clone to be safe). Use type assertation to convert type as compiler can't figure this out on it's own
-
-    const removedStatsPlayers: ModifiedStatsPlayer[] = allStatsPlayersClone.map(
-      // now switching type to allow empty string literals
-      (el) => {
-        const keyIterator = el.keys(); // had to extend AllStatsPlayer interface to Map to allow use of keys()
-        const key = keyIterator.next().value;
-        console.log(key);
-
-        const statsToRemove = ['nationality', 'team']; // could be randomiser function
-        const randomIndex = Math.floor(Math.random() * 2);
-        const randomKey = statsToRemove[randomIndex];
-
-        if (el.get(key) !== undefined) {
-          // check that the player value is not undefined, better safety
-          // Non-null expression You can postfix an expression with ! to tell TypeScript that you know it's not null or undefined. This works the same as an 'as' assertion.
-          el.get(key)![randomKey] = '';
-          el.get(key)!.name = ''; // always remove name
-        }
-        return el;
-      }
-    );
-    return removedStatsPlayers;
-  }
-  const removedStatsPlayers = statRemover(allStatsPlayers);
+  // Create array of players with removed stats
+  const removedStatsPlayers = createRemovedStatsPlayers(allStatsPlayers);
 
   console.log(removedStatsPlayers);
   console.log(allStatsPlayers);
