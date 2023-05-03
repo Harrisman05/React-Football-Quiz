@@ -6,15 +6,19 @@ import AllStatPlayerReduce from './types/AllStatPlayerReduce';
 import ModifiedStatsPlayer from './types/ModifiedStatsPlayer';
 import removeAbbrevName from './utils/removeAbbrevName';
 import UserAnswers from './types/UserAnswers';
-import { cloneDeep } from 'lodash';
 import extractAllStats from './utils/extractAllStats';
-import randomStatRemover from './utils/createRemovedStatsPlayers';
 import createRemovedStatsPlayers from './utils/createRemovedStatsPlayers';
+import handleSubmit from './utils/handleSubmit';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
   const [statRemove, setStatRemove] = useState<ModifiedStatsPlayer[]>([]);
   const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
+
+  function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+    const userAnswers = handleSubmit(e);
+    setUserAnswers(userAnswers);
+  }
 
   /* Run using API --------------------------------------------------------------------------------- */
 
@@ -89,38 +93,6 @@ function App() {
 
   console.log(removedStatsPlayers);
   console.log(allStatsPlayers);
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget; // currentTarget because event.target can be anything because of event bubbling - https://stackoverflow.com/questions/73819465/argument-of-type-eventtarget-is-not-assignable-to-parameter-of-type-htmlforme
-
-    const formData = new FormData(form);
-    const userAnswers: UserAnswers = new Map();
-
-    for (const [nameId, value] of formData.entries()) {
-      console.log(nameId, value);
-      const [name, idStr] = nameId.split('-');
-      const id = Number(idStr); // values coming from form are always strings, convert to number to avoid type errors
-      console.log(id, name, value);
-
-      if (!userAnswers.has(id)) {
-        // set id as a key on the user answer map if it doesn't exist
-        userAnswers.set(id, {
-          [name]: value,
-        });
-      } else {
-        const answerObject = userAnswers.get(id);
-        const updatedAnswer = {
-          ...answerObject,
-          [name]: value,
-        };
-        userAnswers.set(id, updatedAnswer);
-      }
-    }
-
-    console.log(typeof userAnswers);
-    setUserAnswers(userAnswers);
-  }
 
   useEffect(() => {
     if (userAnswers) {
@@ -208,7 +180,7 @@ function App() {
         Remove stats
       </button>
       <div className='bg-red-600 flex-col'>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleFormSubmit}>
           {statRemove.map((player: ModifiedStatsPlayer) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
             return (
