@@ -1,6 +1,7 @@
 import AllStatsPlayer from '../types/AllStatsPlayer';
 import { cloneDeep } from 'lodash';
 import ModifiedStatsPlayer from '../types/ModifiedStatsPlayer';
+import getCurrentKey from './getCurrentKey';
 
 export default function createRemovedStatsPlayers(allStatsPlayers: AllStatsPlayer[]) {
   const allStatsPlayersClone = cloneDeep(
@@ -26,13 +27,6 @@ function randomStatRemover(allStatsPlayers: AllStatsPlayer[]) {
     }
   );
   return removedStatsPlayers;
-}
-
-function getCurrentKey(el: ModifiedStatsPlayer) {
-  const keyIterator = el.keys(); // had to extend AllStatsPlayer interface to Map to allow use of keys()
-  const currentKey = keyIterator.next().value;
-  console.log(currentKey);
-  return currentKey;
 }
 
 function getRandomStatToRemove() {

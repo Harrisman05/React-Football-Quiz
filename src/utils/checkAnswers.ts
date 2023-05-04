@@ -2,71 +2,115 @@ import AllStatPlayerReduce from '../types/AllStatPlayerReduce';
 import AllStatsPlayer from '../types/AllStatsPlayer';
 import ModifiedStatsPlayer from '../types/ModifiedStatsPlayer';
 import UserAnswers from '../types/UserAnswers';
+import getCurrentKey from './getCurrentKey';
+import RemovedStatPlayer from '../types/removedStatPlayer';
+import UserAnswerPlayer from '../types/userAnswerPlayer';
 
 export default function checkAnswers(
   allStatsPlayers: AllStatsPlayer[],
   statRemove: ModifiedStatsPlayer[],
   userAnswers: UserAnswers
 ) {
-  console.log(allStatsPlayers);
-
   for (let player of statRemove) {
     // extract keys to start extracting players from all the map
-    const keyIterator = player.keys();
-    const key = Number(keyIterator.next().value);
-    console.log(key);
+    const currentKey = getCurrentKey(player);
 
     // Using key, extract data of player for user answers, removed stats and all stats
-    const userAnswerPlayer = userAnswers.get(key);
-    const removedStatPlayer = player.get(key);
+    const userAnswerPlayer: UserAnswerPlayer | undefined =
+      userAnswers.get(currentKey);
+    const removedStatPlayer: RemovedStatPlayer | undefined =
+      player.get(currentKey);
+    const allStatPlayer = getAllStatPlayer(allStatsPlayers, currentKey);
 
-    // This is a bit messy, can't figure out how to ensure a map with key is found to prevent the undefined type being possible
-    const allStatPlayer = allStatsPlayers.reduce(
-      (acc: AllStatPlayerReduce | undefined, el: AllStatsPlayer) => {
-        if (el.get(key)) {
-          acc = el.get(key);
-        }
-        return acc;
-      },
-      undefined
-    );
-
-    // Logs
-
-    console.log(removedStatPlayer);
-    console.log(userAnswerPlayer);
-    console.log(allStatsPlayers);
-    console.log(allStatPlayer);
-    console.log(userAnswerPlayer?.hasOwnProperty('nationality'));
-    console.log(userAnswerPlayer?.hasOwnProperty('team'));
-    console.log(userAnswerPlayer?.hasOwnProperty('goals'));
+    debugLogs(allStatPlayer, removedStatPlayer, userAnswerPlayer);
 
     // Check logic, if user has provided an answer, check their answer against all the stats. If correct, update removeStatPlayer and conditionally render the answer
-
-    if (userAnswerPlayer?.hasOwnProperty('name')) {
-      console.log('found name');
-      if (allStatPlayer!.name === userAnswerPlayer.name) {
-        console.log('match');
-        removedStatPlayer!.name = userAnswerPlayer.name;
-      }
-    }
-
-    if (userAnswerPlayer?.hasOwnProperty('nationality')) {
-      console.log('found nationality');
-      if (allStatPlayer!.nationality === userAnswerPlayer.nationality) {
-        console.log('match');
-        removedStatPlayer!.nationality = userAnswerPlayer.nationality;
-      }
-    }
-
-    if (userAnswerPlayer?.hasOwnProperty('team')) {
-      console.log('found team');
-      if (allStatPlayer!.team === userAnswerPlayer.team) {
-        console.log('match');
-        removedStatPlayer!.team = userAnswerPlayer.team;
-      }
-    }
+    checkNameAnswer(allStatPlayer, removedStatPlayer, userAnswerPlayer);
+    checkNationalityAnswer(allStatPlayer, removedStatPlayer, userAnswerPlayer);
+    checkTeamAnswer(allStatPlayer, removedStatPlayer, userAnswerPlayer);
   }
-
   return [...statRemove];
 }
+
+function getAllStatPlayer(
+  allStatsPlayers: AllStatsPlayer[],
+  currentKey: number
+) {
+  // This is a bit messy, can't figure out how to ensure a map with key is found to prevent the undefined type being possible
+  return allStatsPlayers.reduce(
+    (acc: AllStatPlayerReduce | undefined, el: AllStatsPlayer) => {
+      if (el.get(currentKey)) {
+        acc = el.get(currentKey);
+      }
+      return acc;
+    },
+    undefined
+  );
+}
+
+function debugLogs(
+  allStatPlayer: AllStatPlayerReduce | undefined,
+  removedStatPlayer: RemovedStatPlayer | undefined,
+  userAnswerPlayer: UserAnswerPlayer | undefined
+) {
+  // Logs
+  console.log(allStatPlayer);
+  console.log(removedStatPlayer);
+  console.log(userAnswerPlayer);
+  console.log(userAnswerPlayer?.hasOwnProperty('nationality'));
+  console.log(userAnswerPlayer?.hasOwnProperty('team'));
+  console.log(userAnswerPlayer?.hasOwnProperty('goals'));
+}
+
+function checkNameAnswer(
+  allStatPlayer: AllStatPlayerReduce | undefined,
+  removedStatPlayer: RemovedStatPlayer | undefined,
+  userAnswerPlayer: UserAnswerPlayer | undefined
+) {
+  if (userAnswerPlayer?.hasOwnProperty('name')) {
+    console.log('found name');
+    if (allStatPlayer!.name === userAnswerPlayer.name) {
+      console.log('match');
+      removedStatPlayer!.name = userAnswerPlayer.name;
+    }
+  }
+}
+
+function checkNationalityAnswer(
+  allStatPlayer: AllStatPlayerReduce | undefined,
+  removedStatPlayer: RemovedStatPlayer | undefined,
+  userAnswerPlayer: UserAnswerPlayer | undefined
+) {
+  if (userAnswerPlayer?.hasOwnProperty('nationality')) {
+    console.log('found nationality');
+    if (allStatPlayer!.nationality === userAnswerPlayer.nationality) {
+      console.log('match');
+      removedStatPlayer!.nationality = userAnswerPlayer.nationality;
+    }
+  }
+}
+
+function checkTeamAnswer(
+  allStatPlayer: AllStatPlayerReduce | undefined,
+  removedStatPlayer: RemovedStatPlayer | undefined,
+  userAnswerPlayer: UserAnswerPlayer | undefined
+) {
+  if (userAnswerPlayer?.hasOwnProperty('team')) {
+    console.log('found team');
+    if (allStatPlayer!.team === userAnswerPlayer.team) {
+      console.log('match');
+      removedStatPlayer!.team = userAnswerPlayer.team;
+    }
+  }
+}
+
+// function checkProperty(property: string | undefined, allStatPlayer: AllStatPlayerReduce | undefined, removedStatPlayer: RemovedStatPlayer | undefined, userAnswerPlayer: UserAnswerPlayer | undefined)
+// {
+//   if (userAnswerPlayer?.hasOwnProperty(`${property}`)) {
+//     console.log(`Found ${property}`);
+//     if (allStatPlayer!.name === userAnswerPlayer.name) {
+//       console.log('match');
+//       removedStatPlayer!.name = userAnswerPlayer.name;
+//     }
+//   }
+// }
