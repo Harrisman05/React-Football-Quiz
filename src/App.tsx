@@ -9,6 +9,8 @@ import extractAllStats from './utils/extractAllStats';
 import createRemovedStatsPlayers from './utils/createRemovedStatsPlayers';
 import updateUserAnswers from './utils/updateUserAnswers';
 import checkUserAnswers from './utils/checkUserAnswers';
+import QuizForm from './components/QuizField';
+import QuizField from './components/QuizField';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
@@ -21,7 +23,11 @@ function App() {
   }
 
   function handleCheckAnswers() {
-    const updatedRemovedStats = checkUserAnswers(allStatsPlayer, statRemove, userAnswers);
+    const updatedRemovedStats = checkUserAnswers(
+      allStatsPlayer,
+      statRemove,
+      userAnswers
+    );
     setStatRemove(updatedRemovedStats);
   }
 
@@ -79,7 +85,9 @@ function App() {
 
   /* Run using local data -------------------------------------------------------------------------- */
 
-  const allStatsPlayer: AllStatsPlayer[] = extractAllStats(example_json['response']);
+  const allStatsPlayer: AllStatsPlayer[] = extractAllStats(
+    example_json['response']
+  );
   console.log(allStatsPlayer);
 
   useEffect(() => {
@@ -121,33 +129,34 @@ function App() {
         <form onSubmit={handleFormSubmit}>
           {statRemove.map((player: ModifiedStatsPlayer) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
+            console.log(stats);
             return (
               <div key={id.toString()} className='flex gap-8'>
                 <div className='w-40 flex items-center'>{stats.ranking}</div>
-                {stats.name === '' ? (
-                  <input name={`name-${id}`} className='w-40 bg-slate-400' />
-                ) : (
-                  <div className='w-40 flex items-center border-s-blue-900'>
-                    {stats.name}
-                  </div>
-                )}
-                {stats.nationality === '' ? (
-                  <input name={`nationality-${id}`} className='w-40' />
-                ) : (
-                  <div className='w-40 flex items-center'>
-                    {stats.nationality}
-                  </div>
-                )}
-                {stats.team === '' ? (
-                  <input name={`team-${id}`} className='w-40' />
-                ) : (
-                  <div className='w-40 flex items-center'>{stats.team}</div>
-                )}
-                {stats.goals === 0 ? (
-                  <input name={`goals-${id}`} className='w-40' />
-                ) : (
-                  <div className='w-40 flex items-center'>{stats.goals}</div>
-                )}
+                <QuizField
+                  id={id}
+                  stats={stats}
+                  statsKey={'name'}
+                  inputIdentifier={'name'}
+                />
+                <QuizField
+                  id={id}
+                  stats={stats}
+                  statsKey={'nationality'}
+                  inputIdentifier={'nationality'}
+                />
+                <QuizField
+                  id={id}
+                  stats={stats}
+                  statsKey={'team'}
+                  inputIdentifier={'team'}
+                />
+                <QuizField
+                  id={id}
+                  stats={stats}
+                  statsKey={'goals'}
+                  inputIdentifier={'goals'}
+                />
               </div>
             );
           })}
