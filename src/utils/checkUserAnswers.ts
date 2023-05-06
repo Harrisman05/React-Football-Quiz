@@ -6,13 +6,13 @@ import getCurrentKey from './getCurrentKey';
 import RemovedStatPlayer from '../types/removedStatPlayer';
 import UserAnswerPlayer from '../types/userAnswerPlayer';
 
-export default function checkAnswers(
+export default function checkUserAnswers(
   allStatsPlayers: AllStatsPlayer[],
   statRemove: ModifiedStatsPlayer[],
   userAnswers: UserAnswers
 ) {
   for (let player of statRemove) {
-    // extract keys to start extracting players from all the map
+    // extract keys to use to start extracting players from all the maps
     const currentKey = getCurrentKey(player);
 
     // Using key, extract data of player for user answers, removed stats and all stats
@@ -103,14 +103,3 @@ function checkTeamAnswer(
     }
   }
 }
-
-// function checkProperty(property: string | undefined, allStatPlayer: AllStatPlayerReduce | undefined, removedStatPlayer: RemovedStatPlayer | undefined, userAnswerPlayer: UserAnswerPlayer | undefined)
-// {
-//   if (userAnswerPlayer?.hasOwnProperty(`${property}`)) {
-//     console.log(`Found ${property}`);
-//     if (allStatPlayer!.name === userAnswerPlayer.name) {
-//       console.log('match');
-//       removedStatPlayer!.name = userAnswerPlayer.name;
-//     }
-//   }
-// }

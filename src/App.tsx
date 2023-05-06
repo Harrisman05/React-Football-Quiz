@@ -1,15 +1,14 @@
-import { ReactEventHandler, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import example_json from './assets/example_json';
 import PlayerStats from './types/PlayerStats';
 import AllStatsPlayer from './types/AllStatsPlayer';
-import AllStatPlayerReduce from './types/AllStatPlayerReduce';
 import ModifiedStatsPlayer from './types/ModifiedStatsPlayer';
 import removeAbbrevName from './utils/removeAbbrevName';
 import UserAnswers from './types/UserAnswers';
 import extractAllStats from './utils/extractAllStats';
 import createRemovedStatsPlayers from './utils/createRemovedStatsPlayers';
-import handleSubmit from './utils/handleSubmit';
-import checkAnswers from './utils/checkAnswers';
+import updateUserAnswers from './utils/updateUserAnswers';
+import checkUserAnswers from './utils/checkUserAnswers';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
@@ -17,12 +16,12 @@ function App() {
   const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
 
   function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
-    const userAnswers = handleSubmit(e);
+    const userAnswers = updateUserAnswers(e);
     setUserAnswers(userAnswers);
   }
 
   function handleCheckAnswers() {
-    const updatedRemovedStats = checkAnswers(allStatsPlayer, statRemove, userAnswers);
+    const updatedRemovedStats = checkUserAnswers(allStatsPlayer, statRemove, userAnswers);
     setStatRemove(updatedRemovedStats);
   }
 
@@ -105,17 +104,13 @@ function App() {
     if (userAnswers) {
       handleCheckAnswers();
     }
+    console.log(userAnswers);
   }, [userAnswers]);
 
   useEffect(() => {
     // using setState is kinda async, so need to log out update inside a useEffect
     console.log(statRemove);
   }, [statRemove]);
-
-  useEffect(() => {
-    // using setState is kinda async, so need to log out update inside a useEffect
-    console.log(userAnswers);
-  }, [userAnswers]);
 
   return (
     <div className='App'>
