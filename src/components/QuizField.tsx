@@ -1,4 +1,6 @@
 import InputFieldStats from '../types/InputFieldStats';
+import TextareaAutosize from 'react-textarea-autosize';
+
 
 interface Props {
   id: number;
@@ -21,9 +23,9 @@ const QuizField: React.FC<Props> = ({
   return (
     <>
       {stats[statsKey] === '' ? (
-        <input
+        <TextareaAutosize minRows={1}
           name={`${inputIdentifier}-${id}`}
-          className='bg-slate-400 w-32 p-1'
+          className='bg-slate-400 w-32  p-1 resize-none h-max'
         />
       ) : (
         <div className='w-32 text-center border-s-blue-900 p-1'>
