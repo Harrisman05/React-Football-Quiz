@@ -125,14 +125,21 @@ function App() {
       <button onClick={() => setStatRemove(removedStatsPlayers)}>
         Remove stats
       </button>
-      <div className='bg-red-600 flex-col'>
+      <div className='bg-red-600 flex-col w-fit'>
+        <div className='flex'>
+          <div className='w-16 text-center'>Ranking</div>
+          <div className='w-32 text-center'>Name</div>
+          <div className='w-32 text-center'>Nationality</div>
+          <div className='w-32 text-center'>Team</div>
+          <div className='w-32 text-center'>Goals</div>
+        </div>
         <form onSubmit={handleFormSubmit}>
           {statRemove.map((player: ModifiedStatsPlayer) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
             console.log(stats);
             return (
-              <div key={id.toString()} className='flex gap-8'>
-                <div className='w-40 flex items-center'>{stats.ranking}</div>
+              <div key={id.toString()} className='flex'>
+                <div className='text-center w-16 p-1'>{stats.ranking}</div>
                 <QuizField
                   id={id}
                   stats={stats}
@@ -160,7 +167,9 @@ function App() {
               </div>
             );
           })}
-          <button type='submit'>Submit</button>
+          <div className='flex justify-center p-2'>
+            <button type='submit'>Submit</button>
+          </div>
         </form>
       </div>
     </div>
