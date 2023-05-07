@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import example_json from './assets/example_json';
 import PlayerStats from './types/PlayerStats';
 import AllStatsPlayer from './types/AllStatsPlayer';
@@ -9,7 +9,7 @@ import extractAllStats from './utils/extractAllStats';
 import createRemovedStatsPlayers from './utils/createRemovedStatsPlayers';
 import updateUserAnswers from './utils/updateUserAnswers';
 import checkUserAnswers from './utils/checkUserAnswers';
-import QuizForm from './components/QuizField';
+import useResizeObserver from 'use-resize-observer';
 import QuizField from './components/QuizField';
 
 function App() {
@@ -120,6 +120,10 @@ function App() {
     console.log(statRemove);
   }, [statRemove]);
 
+  const {ref, height} = useResizeObserver()
+  console.log(ref);
+  console.log(height);
+
   return (
     <div className='App'>
       <button onClick={() => setStatRemove(removedStatsPlayers)}>
@@ -128,17 +132,17 @@ function App() {
       <div className='bg-red-600 flex-col w-fit'>
         <div className='flex'>
           <div className='w-16 text-center'>Ranking</div>
-          <div className='w-32 text-center'>Name</div>
-          <div className='w-32 text-center'>Nationality</div>
-          <div className='w-32 text-center'>Team</div>
-          <div className='w-32 text-center'>Goals</div>
+          <div className='w-48 text-center'>Name</div>
+          <div className='w-48 text-center'>Nationality</div>
+          <div className='w-48 text-center'>Team</div>
+          <div className='w-16 text-center'>Goals</div>
         </div>
         <form onSubmit={handleFormSubmit}>
           {statRemove.map((player: ModifiedStatsPlayer) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
             console.log(stats);
             return (
-              <div key={id.toString()} className='flex'>
+              <div key={id.toString()} className='flex' ref={ref}>
                 <div className='text-center w-16 p-1'>{stats.ranking}</div>
                 <QuizField
                   id={id}
@@ -158,12 +162,7 @@ function App() {
                   statsKey={'team'}
                   inputIdentifier={'team'}
                 />
-                <QuizField
-                  id={id}
-                  stats={stats}
-                  statsKey={'goals'}
-                  inputIdentifier={'goals'}
-                />
+                <div className='text-center w-16 p-1'>{stats.goals}</div>
               </div>
             );
           })}

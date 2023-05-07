@@ -1,5 +1,5 @@
+import { useState } from 'react';
 import InputFieldStats from '../types/InputFieldStats';
-import TextareaAutosize from 'react-textarea-autosize';
 
 
 interface Props {
@@ -15,20 +15,29 @@ const QuizField: React.FC<Props> = ({
   statsKey,
   inputIdentifier,
 }) => {
-  console.log(id);
-  console.log(stats);
-  console.log(statsKey);
-  console.log(inputIdentifier);
-  console.log(stats[statsKey]);
+
+  const [placeholder, setPlaceholder] = useState('???');
+  
+  const handleFocus = () => {
+    setPlaceholder('');
+  }
+
+  const handleBlur = () => {
+    setPlaceholder('???');
+  }
+
   return (
     <>
       {stats[statsKey] === '' ? (
-        <TextareaAutosize minRows={1}
+        <input
           name={`${inputIdentifier}-${id}`}
-          className='bg-slate-400 w-32  p-1 resize-none h-max'
+          placeholder={placeholder}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          className='w-48 p-1 text-center text-last-center rtl focus:bg-blue-100'
         />
       ) : (
-        <div className='w-32 text-center border-s-blue-900 p-1'>
+        <div className='w-48 text-center border-s-blue-900 p-1'>
           {stats[statsKey]}
         </div>
       )}
