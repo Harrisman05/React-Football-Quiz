@@ -9,7 +9,6 @@ import extractAllStats from './utils/extractAllStats';
 import createRemovedStatsPlayers from './utils/createRemovedStatsPlayers';
 import updateUserAnswers from './utils/updateUserAnswers';
 import checkUserAnswers from './utils/checkUserAnswers';
-import useResizeObserver from 'use-resize-observer';
 import QuizField from './components/QuizField';
 
 function App() {
@@ -120,10 +119,6 @@ function App() {
     console.log(statRemove);
   }, [statRemove]);
 
-  const {ref, height} = useResizeObserver()
-  console.log(ref);
-  console.log(height);
-
   return (
     <div className='App'>
       <button onClick={() => setStatRemove(removedStatsPlayers)}>
@@ -142,7 +137,7 @@ function App() {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
             console.log(stats);
             return (
-              <div key={id.toString()} className='flex' ref={ref}>
+              <div key={id.toString()} className='flex'>
                 <div className='text-center w-16 p-1'>{stats.ranking}</div>
                 <QuizField
                   id={id}
