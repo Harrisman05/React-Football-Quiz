@@ -30,7 +30,7 @@ function App() {
 
   function handleCheckAnswers() {
     const updateRemovedStats = checkUserAnswers(
-      allStatsPlayer,
+      allStatsPlayers,
       statsRemove,
       userAnswers
     );
@@ -41,7 +41,7 @@ function App() {
 
   useEffect(() => {
     const getData = async () => {
-      var options = {
+      const options = {
         method: 'GET',
         headers: {
           'x-rapidapi-key': import.meta.env.VITE_API_KEY,
@@ -91,13 +91,13 @@ function App() {
 
   /* Run using local data -------------------------------------------------------------------------- */
 
-  const allStatsPlayer: AllStatsPlayer[] = extractAllStats(
+  const allStatsPlayersVar: AllStatsPlayer[] = extractAllStats(
     example_json['response']
   );
-  console.log(allStatsPlayer);
+  console.log(allStatsPlayersVar);
 
   useEffect(() => {
-    setallStatsPlayers(allStatsPlayer);
+    setallStatsPlayers(allStatsPlayersVar);
     // Maps are not valid JSON, so convert each map into object first before stringifying
     const stringifiedMap = JSON.stringify(
       allStatsPlayers.map((map) => Object.fromEntries(map))
@@ -109,7 +109,6 @@ function App() {
 
   // Create array of players with removed stats
   const removedStatsPlayers = createRemovedStatsPlayers(allStatsPlayers);
-
   console.log(removedStatsPlayers);
   console.log(allStatsPlayers);
 
