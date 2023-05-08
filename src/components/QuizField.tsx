@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import InputFieldStats from '../types/InputFieldStats';
-import ModifiedStatsPlayer from '../types/ModifiedStatsPlayer';
 
 interface Props {
   id: number;
   stats: InputFieldStats;
   statsKey: keyof InputFieldStats;
-  inputIdentifier: keyof InputFieldStats;
   originalStats: InputFieldStats;
 }
 
@@ -14,15 +12,14 @@ const QuizField: React.FC<Props> = ({
   id,
   stats,
   statsKey,
-  inputIdentifier,
   originalStats,
 }) => {
-  const [placeholder, setPlaceholder] = useState('???');
+  const inputIdentifier = statsKey; // input-Idendifier used in form data extraction, assigned a variable for semantic reasons in name attribute
 
+  const [placeholder, setPlaceholder] = useState('???');
   const handleFocus = () => {
     setPlaceholder('');
   };
-
   const handleBlur = () => {
     setPlaceholder('???');
   };

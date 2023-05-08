@@ -160,21 +160,18 @@ function App() {
                   id={id}
                   stats={stats}
                   statsKey={'name'}
-                  inputIdentifier={'name'}
                   originalStats={originalStats}
                 />
                 <QuizField
                   id={id}
                   stats={stats}
                   statsKey={'nationality'}
-                  inputIdentifier={'nationality'}
                   originalStats={originalStats}
                 />
                 <QuizField
                   id={id}
                   stats={stats}
                   statsKey={'team'}
-                  inputIdentifier={'team'}
                   originalStats={originalStats}
                 />
                 <div className='text-center w-16 p-1'>{stats.goals}</div>
