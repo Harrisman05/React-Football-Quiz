@@ -10,7 +10,8 @@ export default function checkUserAnswers(
   allStatsPlayers: AllStatsPlayer[],
   statRemove: ModifiedStatsPlayer[],
   userAnswers: UserAnswers
-) {
+) 
+{
   for (let player of statRemove) {
     // extract keys to use to start extracting players from all the maps
     const currentKey = getCurrentKey(player);

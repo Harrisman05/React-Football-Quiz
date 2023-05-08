@@ -10,10 +10,17 @@ import createRemovedStatsPlayers from './utils/createRemovedStatsPlayers';
 import updateUserAnswers from './utils/updateUserAnswers';
 import checkUserAnswers from './utils/checkUserAnswers';
 import QuizField from './components/QuizField';
+import { cloneDeep } from 'lodash';
+import one_player from './assets/one_player';
+import getOriginalStatRemove from './utils/getOriginalStatRemove';
+import QuizHeader from './components/QuizHeader';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
-  const [statRemove, setStatRemove] = useState<ModifiedStatsPlayer[]>([]);
+  const [statsRemove, setStatsRemove] = useState<ModifiedStatsPlayer[]>([]);
+  const [originalStatsRemove, setOriginalStatRemove] = useState<
+    ModifiedStatsPlayer[]
+  >([]);
   const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
 
   function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -22,19 +29,19 @@ function App() {
   }
 
   function handleCheckAnswers() {
-    const updatedRemovedStats = checkUserAnswers(
-      allStatsPlayer,
-      statRemove,
+    const updateRemovedStats = checkUserAnswers(
+      allStatsPlayers,
+      statsRemove,
       userAnswers
     );
-    setStatRemove(updatedRemovedStats);
+    setStatsRemove(updateRemovedStats);
   }
 
   /* Run using API --------------------------------------------------------------------------------- */
 
   useEffect(() => {
     const getData = async () => {
-      var options = {
+      const options = {
         method: 'GET',
         headers: {
           'x-rapidapi-key': import.meta.env.VITE_API_KEY,
@@ -84,13 +91,13 @@ function App() {
 
   /* Run using local data -------------------------------------------------------------------------- */
 
-  const allStatsPlayer: AllStatsPlayer[] = extractAllStats(
+  const allStatsPlayersVar: AllStatsPlayer[] = extractAllStats(
     example_json['response']
   );
-  console.log(allStatsPlayer);
+  console.log(allStatsPlayersVar);
 
   useEffect(() => {
-    setallStatsPlayers(allStatsPlayer);
+    setallStatsPlayers(allStatsPlayersVar);
     // Maps are not valid JSON, so convert each map into object first before stringifying
     const stringifiedMap = JSON.stringify(
       allStatsPlayers.map((map) => Object.fromEntries(map))
@@ -102,7 +109,6 @@ function App() {
 
   // Create array of players with removed stats
   const removedStatsPlayers = createRemovedStatsPlayers(allStatsPlayers);
-
   console.log(removedStatsPlayers);
   console.log(allStatsPlayers);
 
@@ -116,26 +122,36 @@ function App() {
 
   useEffect(() => {
     // using setState is kinda async, so need to log out update inside a useEffect
-    console.log(statRemove);
-  }, [statRemove]);
+    console.log(statsRemove);
+    if (originalStatsRemove.length === 0) {
+      // if original is already set, don't set it again
+      const originalStatRemoveClone = cloneDeep(
+        statsRemove
+      ) as ModifiedStatsPlayer[];
+      setOriginalStatRemove(originalStatRemoveClone);
+    }
+  }, [statsRemove]);
+
+  useEffect(() => {
+    // using setState is kinda async, so need to log out update inside a useEffect
+    console.log(originalStatsRemove);
+  }, [originalStatsRemove]);
 
   return (
     <div className='App'>
-      <button onClick={() => setStatRemove(removedStatsPlayers)}>
+      <button onClick={() => setStatsRemove(removedStatsPlayers)}>
         Remove stats
       </button>
       <div className='bg-red-600 flex-col w-fit'>
-        <div className='flex'>
-          <div className='w-16 text-center'>Ranking</div>
-          <div className='w-48 text-center'>Name</div>
-          <div className='w-48 text-center'>Nationality</div>
-          <div className='w-48 text-center'>Team</div>
-          <div className='w-16 text-center'>Goals</div>
-        </div>
+        <QuizHeader/>
         <form onSubmit={handleFormSubmit}>
-          {statRemove.map((player: ModifiedStatsPlayer) => {
+          {statsRemove.map((player: ModifiedStatsPlayer) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
+            const originalStats = getOriginalStatRemove(originalStatsRemove, id); // use weird reduce method to get the stats object out of map using id
+            console.log(id);
             console.log(stats);
+            console.log(originalStats);
+
             return (
               <div key={id.toString()} className='flex'>
                 <div className='text-center w-16 p-1'>{stats.ranking}</div>
@@ -143,19 +159,19 @@ function App() {
                   id={id}
                   stats={stats}
                   statsKey={'name'}
-                  inputIdentifier={'name'}
+                  originalStats={originalStats}
                 />
                 <QuizField
                   id={id}
                   stats={stats}
                   statsKey={'nationality'}
-                  inputIdentifier={'nationality'}
+                  originalStats={originalStats}
                 />
                 <QuizField
                   id={id}
                   stats={stats}
                   statsKey={'team'}
-                  inputIdentifier={'team'}
+                  originalStats={originalStats}
                 />
                 <div className='text-center w-16 p-1'>{stats.goals}</div>
               </div>
