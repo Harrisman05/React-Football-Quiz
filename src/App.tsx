@@ -10,10 +10,12 @@ import createRemovedStatsPlayers from './utils/createRemovedStatsPlayers';
 import updateUserAnswers from './utils/updateUserAnswers';
 import checkUserAnswers from './utils/checkUserAnswers';
 import QuizField from './components/QuizField';
+import { cloneDeep } from 'lodash';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
   const [statRemove, setStatRemove] = useState<ModifiedStatsPlayer[]>([]);
+  const [originalStatRemove, setOriginalStatRemove] = useState<ModifiedStatsPlayer[]>([]);
   const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
 
   function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -22,6 +24,14 @@ function App() {
   }
 
   function handleCheckAnswers() {
+
+    if (originalStatRemove.length === 0) {
+      const originalStatRemoveClone = cloneDeep(
+        statRemove
+      ) as ModifiedStatsPlayer[];
+      setOriginalStatRemove(originalStatRemoveClone)
+    }
+
     const updatedRemovedStats = checkUserAnswers(
       allStatsPlayer,
       statRemove,
@@ -119,6 +129,11 @@ function App() {
     console.log(statRemove);
   }, [statRemove]);
 
+  useEffect(() => {
+    // using setState is kinda async, so need to log out update inside a useEffect
+    console.log(originalStatRemove);
+  }, [originalStatRemove]);
+
   return (
     <div className='App'>
       <button onClick={() => setStatRemove(removedStatsPlayers)}>
@@ -135,6 +150,7 @@ function App() {
         <form onSubmit={handleFormSubmit}>
           {statRemove.map((player: ModifiedStatsPlayer) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
+            console.log(id);
             console.log(stats);
             return (
               <div key={id.toString()} className='flex'>
