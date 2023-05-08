@@ -11,11 +11,14 @@ import updateUserAnswers from './utils/updateUserAnswers';
 import checkUserAnswers from './utils/checkUserAnswers';
 import QuizField from './components/QuizField';
 import { cloneDeep } from 'lodash';
+import one_player from './assets/one_player';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
   const [statRemove, setStatRemove] = useState<ModifiedStatsPlayer[]>([]);
-  const [originalStatRemove, setOriginalStatRemove] = useState<ModifiedStatsPlayer[]>([]);
+  const [originalStatsRemove, setOriginalStatRemove] = useState<
+    ModifiedStatsPlayer[]
+  >([]);
   const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
 
   function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -24,14 +27,6 @@ function App() {
   }
 
   function handleCheckAnswers() {
-
-    if (originalStatRemove.length === 0) {
-      const originalStatRemoveClone = cloneDeep(
-        statRemove
-      ) as ModifiedStatsPlayer[];
-      setOriginalStatRemove(originalStatRemoveClone)
-    }
-
     const updatedRemovedStats = checkUserAnswers(
       allStatsPlayer,
       statRemove,
@@ -127,12 +122,19 @@ function App() {
   useEffect(() => {
     // using setState is kinda async, so need to log out update inside a useEffect
     console.log(statRemove);
+    if (originalStatsRemove.length === 0) {
+      // if original is already set, don't set it again
+      const originalStatRemoveClone = cloneDeep(
+        statRemove
+      ) as ModifiedStatsPlayer[];
+      setOriginalStatRemove(originalStatRemoveClone);
+    }
   }, [statRemove]);
 
   useEffect(() => {
     // using setState is kinda async, so need to log out update inside a useEffect
-    console.log(originalStatRemove);
-  }, [originalStatRemove]);
+    console.log(originalStatsRemove);
+  }, [originalStatsRemove]);
 
   return (
     <div className='App'>
@@ -152,6 +154,21 @@ function App() {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
             console.log(id);
             console.log(stats);
+            console.log(originalStatsRemove);
+
+            const checkStat = originalStatsRemove.reduce(
+              (acc: any, el: AllStatsPlayer) => { 
+                console.log(el);
+                if (el.get(id)) {
+                  acc = el.get(id);
+                }
+                return acc;
+              },
+              ''
+            );
+
+            console.log(checkStat);
+
             return (
               <div key={id.toString()} className='flex'>
                 <div className='text-center w-16 p-1'>{stats.ranking}</div>
@@ -160,18 +177,21 @@ function App() {
                   stats={stats}
                   statsKey={'name'}
                   inputIdentifier={'name'}
+                  checkStat={checkStat && checkStat}
                 />
                 <QuizField
                   id={id}
                   stats={stats}
                   statsKey={'nationality'}
                   inputIdentifier={'nationality'}
+                  checkStat={checkStat && checkStat} // only render updated stat if it's defined
                 />
                 <QuizField
                   id={id}
                   stats={stats}
                   statsKey={'team'}
                   inputIdentifier={'team'}
+                  checkStat={checkStat && checkStat}
                 />
                 <div className='text-center w-16 p-1'>{stats.goals}</div>
               </div>
