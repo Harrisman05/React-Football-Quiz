@@ -12,6 +12,8 @@ import checkUserAnswers from './utils/checkUserAnswers';
 import QuizField from './components/QuizField';
 import { cloneDeep } from 'lodash';
 import one_player from './assets/one_player';
+import getOriginalStatRemove from './utils/getOriginalStatRemove';
+import QuizHeader from './components/QuizHeader';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
@@ -27,12 +29,12 @@ function App() {
   }
 
   function handleCheckAnswers() {
-    const updatedRemovedStats = checkUserAnswers(
+    const updateRemovedStats = checkUserAnswers(
       allStatsPlayer,
       statsRemove,
       userAnswers
     );
-    setStatsRemove(updatedRemovedStats);
+    setStatsRemove(updateRemovedStats);
   }
 
   /* Run using API --------------------------------------------------------------------------------- */
@@ -142,30 +144,13 @@ function App() {
         Remove stats
       </button>
       <div className='bg-red-600 flex-col w-fit'>
-        <div className='flex'>
-          <div className='w-16 text-center'>Ranking</div>
-          <div className='w-48 text-center'>Name</div>
-          <div className='w-48 text-center'>Nationality</div>
-          <div className='w-48 text-center'>Team</div>
-          <div className='w-16 text-center'>Goals</div>
-        </div>
+        <QuizHeader/>
         <form onSubmit={handleFormSubmit}>
           {statsRemove.map((player: ModifiedStatsPlayer) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
+            const originalStats = getOriginalStatRemove(originalStatsRemove, id); // use weird reduce method to get the stats object out of map using id
             console.log(id);
             console.log(stats);
-            console.log(originalStatsRemove);
-
-            const originalStats = originalStatsRemove.reduce(
-              (acc: any, el: AllStatsPlayer) => {  // can't figure out how to not have any here without undefined
-                console.log(el);
-                if (el.get(id)) {
-                  acc = el.get(id);
-                }
-                return acc;
-              },
-              ''
-            );
             console.log(originalStats);
 
             return (
@@ -183,7 +168,7 @@ function App() {
                   stats={stats}
                   statsKey={'nationality'}
                   inputIdentifier={'nationality'}
-                  originalStats={originalStats} // only render updated stat if it's defined
+                  originalStats={originalStats}
                 />
                 <QuizField
                   id={id}
