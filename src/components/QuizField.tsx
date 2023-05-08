@@ -7,7 +7,7 @@ interface Props {
   stats: InputFieldStats;
   statsKey: keyof InputFieldStats;
   inputIdentifier: keyof InputFieldStats;
-  checkStat: InputFieldStats;
+  originalStats: InputFieldStats;
 }
 
 const QuizField: React.FC<Props> = ({
@@ -15,7 +15,7 @@ const QuizField: React.FC<Props> = ({
   stats,
   statsKey,
   inputIdentifier,
-  checkStat,
+  originalStats,
 }) => {
   const [placeholder, setPlaceholder] = useState('???');
 
@@ -32,8 +32,7 @@ const QuizField: React.FC<Props> = ({
       {console.log(stats)}
       {console.log(statsKey)}
       {console.log(stats[statsKey])}
-      {console.log(checkStat[statsKey])}
-      {console.log(checkStat && stats[statsKey] === checkStat[statsKey])}
+      {console.log(originalStats[statsKey])}
 
       {stats[statsKey] === '' ? (
         <input
@@ -43,7 +42,7 @@ const QuizField: React.FC<Props> = ({
           onBlur={handleBlur}
           className='w-48 p-1 text-center text-last-center rtl focus:bg-blue-100'
         />
-      ) : stats[statsKey] === checkStat[statsKey] ? (
+      ) : stats[statsKey] === originalStats[statsKey] ? (
         <div className='w-48 text-center border-s-blue-900 p-1'>
           {stats[statsKey]}
         </div>

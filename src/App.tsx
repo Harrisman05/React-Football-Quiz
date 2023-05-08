@@ -15,7 +15,7 @@ import one_player from './assets/one_player';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
-  const [statRemove, setStatRemove] = useState<ModifiedStatsPlayer[]>([]);
+  const [statsRemove, setStatsRemove] = useState<ModifiedStatsPlayer[]>([]);
   const [originalStatsRemove, setOriginalStatRemove] = useState<
     ModifiedStatsPlayer[]
   >([]);
@@ -29,10 +29,10 @@ function App() {
   function handleCheckAnswers() {
     const updatedRemovedStats = checkUserAnswers(
       allStatsPlayer,
-      statRemove,
+      statsRemove,
       userAnswers
     );
-    setStatRemove(updatedRemovedStats);
+    setStatsRemove(updatedRemovedStats);
   }
 
   /* Run using API --------------------------------------------------------------------------------- */
@@ -121,15 +121,15 @@ function App() {
 
   useEffect(() => {
     // using setState is kinda async, so need to log out update inside a useEffect
-    console.log(statRemove);
+    console.log(statsRemove);
     if (originalStatsRemove.length === 0) {
       // if original is already set, don't set it again
       const originalStatRemoveClone = cloneDeep(
-        statRemove
+        statsRemove
       ) as ModifiedStatsPlayer[];
       setOriginalStatRemove(originalStatRemoveClone);
     }
-  }, [statRemove]);
+  }, [statsRemove]);
 
   useEffect(() => {
     // using setState is kinda async, so need to log out update inside a useEffect
@@ -138,7 +138,7 @@ function App() {
 
   return (
     <div className='App'>
-      <button onClick={() => setStatRemove(removedStatsPlayers)}>
+      <button onClick={() => setStatsRemove(removedStatsPlayers)}>
         Remove stats
       </button>
       <div className='bg-red-600 flex-col w-fit'>
@@ -150,14 +150,14 @@ function App() {
           <div className='w-16 text-center'>Goals</div>
         </div>
         <form onSubmit={handleFormSubmit}>
-          {statRemove.map((player: ModifiedStatsPlayer) => {
+          {statsRemove.map((player: ModifiedStatsPlayer) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
             console.log(id);
             console.log(stats);
             console.log(originalStatsRemove);
 
-            const checkStat = originalStatsRemove.reduce(
-              (acc: any, el: AllStatsPlayer) => { 
+            const originalStats = originalStatsRemove.reduce(
+              (acc: any, el: AllStatsPlayer) => {  // can't figure out how to not have any here without undefined
                 console.log(el);
                 if (el.get(id)) {
                   acc = el.get(id);
@@ -166,8 +166,7 @@ function App() {
               },
               ''
             );
-
-            console.log(checkStat);
+            console.log(originalStats);
 
             return (
               <div key={id.toString()} className='flex'>
@@ -177,21 +176,21 @@ function App() {
                   stats={stats}
                   statsKey={'name'}
                   inputIdentifier={'name'}
-                  checkStat={checkStat && checkStat}
+                  originalStats={originalStats}
                 />
                 <QuizField
                   id={id}
                   stats={stats}
                   statsKey={'nationality'}
                   inputIdentifier={'nationality'}
-                  checkStat={checkStat && checkStat} // only render updated stat if it's defined
+                  originalStats={originalStats} // only render updated stat if it's defined
                 />
                 <QuizField
                   id={id}
                   stats={stats}
                   statsKey={'team'}
                   inputIdentifier={'team'}
-                  checkStat={checkStat && checkStat}
+                  originalStats={originalStats}
                 />
                 <div className='text-center w-16 p-1'>{stats.goals}</div>
               </div>
