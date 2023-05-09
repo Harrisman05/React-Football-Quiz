@@ -14,6 +14,9 @@ import { cloneDeep } from 'lodash';
 import one_player from './assets/one_player';
 import getOriginalStatRemove from './utils/getOriginalStatRemove';
 import QuizHeader from './components/QuizHeader';
+import * as Progress from '@radix-ui/react-progress';
+import './ProgressBar.css'
+import calcEmptyFields from './utils/calcEmptyFields';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
@@ -23,6 +26,7 @@ function App() {
   >([]);
   const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
 
+  const [progressBar, setProgressBar] = useState(0);
   function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     const userAnswers = updateUserAnswers(e);
     setUserAnswers(userAnswers);
@@ -130,6 +134,10 @@ function App() {
       ) as ModifiedStatsPlayer[];
       setOriginalStatRemove(originalStatRemoveClone);
     }
+    const emptyFields: number = calcEmptyFields(statsRemove);
+    console.log(emptyFields);
+    setProgressBar(emptyFields)
+    console.log(progressBar)
   }, [statsRemove]);
 
   useEffect(() => {
@@ -143,11 +151,14 @@ function App() {
         Remove stats
       </button>
       <div className='bg-red-600 flex-col w-fit'>
-        <QuizHeader/>
+        <QuizHeader />
         <form onSubmit={handleFormSubmit}>
           {statsRemove.map((player: ModifiedStatsPlayer) => {
             const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
-            const originalStats = getOriginalStatRemove(originalStatsRemove, id); // use weird reduce method to get the stats object out of map using id
+            const originalStats = getOriginalStatRemove(
+              originalStatsRemove,
+              id
+            ); // use weird reduce method to get the stats object out of map using id
             console.log(id);
             console.log(stats);
             console.log(originalStats);
@@ -182,6 +193,12 @@ function App() {
           </div>
         </form>
       </div>
+      <Progress.Root className='ProgressRoot' value={progressBar}>
+        <Progress.Indicator
+          className='ProgressIndicator'
+          style={{ transform: `translateX(-${100 - progressBar}%)` }}
+        />
+      </Progress.Root>
     </div>
   );
 }
