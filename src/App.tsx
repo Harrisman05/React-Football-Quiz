@@ -136,7 +136,8 @@ function App() {
     }
     const emptyFields: number = calcEmptyFields(statsRemove);
     console.log(emptyFields);
-    setProgressBar(emptyFields)
+    const answeredFields = 10 - emptyFields
+    setProgressBar(answeredFields * 10) // multiply by scaling factor of 10, as progress bar is 1-100%
     console.log(progressBar)
   }, [statsRemove]);
 
