@@ -37,55 +37,62 @@ function App() {
     setStatsRemove(updateRemovedStats);
   }
 
+  useEffect(() => {
+    if (userAnswers) {
+      handleCheckAnswers();
+    }
+    console.log(userAnswers);
+  }, [userAnswers]);
+
   /* Run using API --------------------------------------------------------------------------------- */
 
-  useEffect(() => {
-    const getData = async () => {
-      const options = {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': import.meta.env.VITE_API_KEY,
-        },
-      };
+  // useEffect(() => {
+  //   const getData = async () => {
+  //     const options = {
+  //       method: 'GET',
+  //       headers: {
+  //         'x-rapidapi-key': import.meta.env.VITE_API_KEY,
+  //       },
+  //     };
 
-      const season = 2016;
-      const response = await fetch(
-        `https://v3.football.api-sports.io/players/topscorers?league=39&season=${season}`,
-        options
-      );
+  //     const season = 2016;
+  //     const response = await fetch(
+  //       `https://v3.football.api-sports.io/players/topscorers?league=39&season=${season}`,
+  //       options
+  //     );
 
-      const body = await response.text();
-      const data = JSON.parse(body);
+  //     const body = await response.text();
+  //     const data = JSON.parse(body);
 
-      console.log(data);
+  //     console.log(data);
 
-      const allStatsPlayer: AllStatsPlayer[] = data['response'].map(
-        // player array
-        (el: PlayerStats, index: number) => {
-          const playerMap = new Map();
-          return playerMap.set(el.player.id, {
-            name: removeAbbrevName(el.player.name),
-            firstname: el.player.firstname,
-            lastname: el.player.lastname,
-            nationality: el.player.nationality,
-            team: el.statistics[0].team.name,
-            ranking: index + 1, // index object comes in order, so use index to calculate ranking
-            goals: el.statistics[0].goals.total,
-          });
-        }
-      );
+  //     const allStatsPlayer: AllStatsPlayer[] = data['response'].map(
+  //       // player array
+  //       (el: PlayerStats, index: number) => {
+  //         const playerMap = new Map();
+  //         return playerMap.set(el.player.id, {
+  //           name: removeAbbrevName(el.player.name),
+  //           firstname: el.player.firstname,
+  //           lastname: el.player.lastname,
+  //           nationality: el.player.nationality,
+  //           team: el.statistics[0].team.name,
+  //           ranking: index + 1, // index object comes in order, so use index to calculate ranking
+  //           goals: el.statistics[0].goals.total,
+  //         });
+  //       }
+  //     );
 
-      console.log(allStatsPlayer);
+  //     console.log(allStatsPlayer);
 
-      setallStatsPlayers(allStatsPlayer);
-      // Maps are not valid JSON, so convert each map into object first before stringifying
-      const stringifiedMap = JSON.stringify(
-        allStatsPlayers.map((map) => Object.fromEntries(map))
-      );
-      localStorage.setItem('allStatsPlayers', JSON.stringify(stringifiedMap));
-    };
-    // getData();
-  }, []);
+  //     setallStatsPlayers(allStatsPlayer);
+  //     // Maps are not valid JSON, so convert each map into object first before stringifying
+  //     const stringifiedMap = JSON.stringify(
+  //       allStatsPlayers.map((map) => Object.fromEntries(map))
+  //     );
+  //     localStorage.setItem('allStatsPlayers', JSON.stringify(stringifiedMap));
+  //   };
+  //   // getData();
+  // }, []); 
 
   /* Run using API ^^^-------------------------------------------------------------------------------*/
 
@@ -100,25 +107,16 @@ function App() {
     setallStatsPlayers(allStatsPlayersVar);
     // Maps are not valid JSON, so convert each map into object first before stringifying
     const stringifiedMap = JSON.stringify(
-      allStatsPlayers.map((map) => Object.fromEntries(map))
+      allStatsPlayersVar.map((map) => Object.fromEntries(map))
     );
-    localStorage.setItem('allStatsPlayers', JSON.stringify(stringifiedMap));
+    localStorage.setItem('allStatsPlayers', stringifiedMap);
   }, []);
 
-  /* Run using local data ^^^ -------------------------------------------------------------------------- */
-
-  // Create array of players with removed stats
-  const removedStatsPlayers = createRemovedStatsPlayers(allStatsPlayers);
-  console.log(removedStatsPlayers);
-  console.log(allStatsPlayers);
-
-  // useEffect which monitors if userAnswers state changes, and if it does, invokes handleCheckAnswers function
+  // set removedStatsPlayer after setting allStatsPlayers
   useEffect(() => {
-    if (userAnswers) {
-      handleCheckAnswers();
-    }
-    console.log(userAnswers);
-  }, [userAnswers]);
+    const removedStatsPlayers = createRemovedStatsPlayers(allStatsPlayers);
+    setStatsRemove(removedStatsPlayers);
+  }, [allStatsPlayers]);
 
   useEffect(() => {
     // using setState is kinda async, so need to log out update inside a useEffect
@@ -137,18 +135,20 @@ function App() {
     console.log(originalStatsRemove);
   }, [originalStatsRemove]);
 
+  /* Run using local data ^^^ -------------------------------------------------------------------------- */
+
   return (
     <div className='App'>
-      <button onClick={() => setStatsRemove(removedStatsPlayers)}>
-        Remove stats
-      </button>
       <div className='bg-red-600 flex-col w-fit'>
-        <QuizHeader/>
+        <QuizHeader />
         <form onSubmit={handleFormSubmit}>
           {statsRemove.map((player: ModifiedStatsPlayer) => {
             const currentPlayerStats = [...player.entries()][0]; // extracting id and data out of each map object
             const [id, stats] = currentPlayerStats; // extracting id and data out of each map object
-            const originalStats = getOriginalStatRemove(originalStatsRemove, id); // use weird reduce method to get the stats object out of map using id
+            const originalStats = getOriginalStatRemove(
+              originalStatsRemove,
+              id
+            ); // use weird reduce method to get the stats object out of map using id
 
             return (
               <div key={id.toString()} className='flex'>
