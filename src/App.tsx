@@ -124,12 +124,24 @@ function App() {
 
   // set removedStatsPlayer after setting allStatsPlayers
   useEffect(() => {
-    const removedStatsPlayers = createRemovedStatsPlayers(allStatsPlayers);
-    setStatsRemove(removedStatsPlayers);
-    const stringifiedremovedStatsPlayers = JSON.stringify(
-      removedStatsPlayers.map((map) => Object.fromEntries(map))
-    );
-    localStorage.setItem('removedStatsPlayer', stringifiedremovedStatsPlayers);
+
+    const storedRemovedStatsPlayers = localStorage.getItem('removedStatsPlayers');
+    console.log(storedRemovedStatsPlayers);
+    // if there's no data in array and it doesn't equal null
+    if (storedRemovedStatsPlayers !== '[]' && storedRemovedStatsPlayers !== null) { 
+      const parsedRemovedStatsPlayers = JSON.parse(storedRemovedStatsPlayers);
+      const convertedRemovedStatsPlayers = convertArrayObjsToArrayMaps(parsedRemovedStatsPlayers);
+      const removedStatsPlayers = createRemovedStatsPlayers(convertedRemovedStatsPlayers);
+      setStatsRemove(removedStatsPlayers);
+    } else {
+      // intialise state and set local storage
+      const removedStatsPlayers = createRemovedStatsPlayers(allStatsPlayers);
+      setStatsRemove(removedStatsPlayers);
+      const stringifiedremovedStatsPlayers = JSON.stringify(
+        removedStatsPlayers.map((map) => Object.fromEntries(map))
+      );
+      localStorage.setItem('removedStatsPlayers', stringifiedremovedStatsPlayers);
+    }
   }, [allStatsPlayers]);
 
   useEffect(() => {
