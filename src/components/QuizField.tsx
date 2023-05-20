@@ -2,19 +2,18 @@ import { useState } from 'react';
 import InputFieldStats from '../types/InputFieldStats';
 
 interface Props {
-  id: number;
-  stats: InputFieldStats;
+  currentPlayerStats: any[]
   statsKey: keyof InputFieldStats;
   originalStats: InputFieldStats;
 }
 
 const QuizField: React.FC<Props> = ({
-  id,
-  stats,
+  currentPlayerStats,
   statsKey,
   originalStats,
 }) => {
   const inputIdentifier = statsKey; // input-Idendifier used in form data extraction, assigned a variable for semantic reasons in name attribute
+  const [id, stats] = currentPlayerStats; // de-structure currentPlayerArray to extract id and stats object, do it here to reduce number of props passed in
 
   const [placeholder, setPlaceholder] = useState('???');
   const handleFocus = () => {
