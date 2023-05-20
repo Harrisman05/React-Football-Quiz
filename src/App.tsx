@@ -146,32 +146,27 @@ function App() {
         <QuizHeader/>
         <form onSubmit={handleFormSubmit}>
           {statsRemove.map((player: ModifiedStatsPlayer) => {
-            const [id, stats] = [...player.entries()][0]; // extracting id and data out of each map object
+            const currentPlayerStats = [...player.entries()][0]; // extracting id and data out of each map object
+            const [id, stats] = currentPlayerStats; // extracting id and data out of each map object
             const originalStats = getOriginalStatRemove(originalStatsRemove, id); // use weird reduce method to get the stats object out of map using id
-            console.log(id);
-            console.log(stats);
-            console.log(originalStats);
 
             return (
               <div key={id.toString()} className='flex'>
                 <div className='text-center w-16 p-1'>{stats.ranking}</div>
                 <QuizField
-                  id={id}
-                  stats={stats}
+                  currentPlayerStats={currentPlayerStats}
+                  originalStats={originalStats}
                   statsKey={'name'}
-                  originalStats={originalStats}
                 />
                 <QuizField
-                  id={id}
-                  stats={stats}
+                  currentPlayerStats={currentPlayerStats}
+                  originalStats={originalStats}
                   statsKey={'nationality'}
-                  originalStats={originalStats}
                 />
                 <QuizField
-                  id={id}
-                  stats={stats}
-                  statsKey={'team'}
+                  currentPlayerStats={currentPlayerStats}
                   originalStats={originalStats}
+                  statsKey={'team'}
                 />
                 <div className='text-center w-16 p-1'>{stats.goals}</div>
               </div>
