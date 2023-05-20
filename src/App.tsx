@@ -14,6 +14,7 @@ import { cloneDeep } from 'lodash';
 import one_player from './assets/one_player';
 import getOriginalStatRemove from './utils/getOriginalStatRemove';
 import QuizHeader from './components/QuizHeader';
+import convertArrayObjsToArrayMaps from './utils/convertArrayObjsToArrayMaps';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
@@ -104,18 +105,31 @@ function App() {
   console.log(allStatsPlayersVar);
 
   useEffect(() => {
-    setallStatsPlayers(allStatsPlayersVar);
-    // Maps are not valid JSON, so convert each map into object first before stringifying
-    const stringifiedMap = JSON.stringify(
-      allStatsPlayersVar.map((map) => Object.fromEntries(map))
-    );
-    localStorage.setItem('allStatsPlayers', stringifiedMap);
+
+    const storedAllStatsPlayers = localStorage.getItem('allStatsPlayers');
+    if (storedAllStatsPlayers) {
+      const parsedAllStatsPlayers = JSON.parse(storedAllStatsPlayers);
+      const convertedAllStatsPlayer = convertArrayObjsToArrayMaps(parsedAllStatsPlayers);
+      setallStatsPlayers(convertedAllStatsPlayer);
+    } else {
+      setallStatsPlayers(allStatsPlayersVar);
+      // Maps are not valid JSON, so convert each map into object first before stringifying
+      const stringifiedAllStatsPlayer = JSON.stringify(
+        allStatsPlayersVar.map((map) => Object.fromEntries(map))
+      );
+      console.log('set local storage');
+      localStorage.setItem('allStatsPlayers', stringifiedAllStatsPlayer);
+    }
   }, []);
 
   // set removedStatsPlayer after setting allStatsPlayers
   useEffect(() => {
     const removedStatsPlayers = createRemovedStatsPlayers(allStatsPlayers);
     setStatsRemove(removedStatsPlayers);
+    const stringifiedremovedStatsPlayers = JSON.stringify(
+      removedStatsPlayers.map((map) => Object.fromEntries(map))
+    );
+    localStorage.setItem('removedStatsPlayer', stringifiedremovedStatsPlayers);
   }, [allStatsPlayers]);
 
   useEffect(() => {
@@ -127,6 +141,10 @@ function App() {
         statsRemove
       ) as ModifiedStatsPlayer[];
       setOriginalStatRemove(originalStatRemoveClone);
+      const stringifiedOriginalStatRemove = JSON.stringify(
+        originalStatRemoveClone.map((map) => Object.fromEntries(map))
+      );
+      localStorage.setItem('originalStatRemove', stringifiedOriginalStatRemove);
     }
   }, [statsRemove]);
 
