@@ -11,7 +11,6 @@ import updateUserAnswers from './utils/updateUserAnswers';
 import checkUserAnswers from './utils/checkUserAnswers';
 import QuizField from './components/QuizField';
 import { cloneDeep } from 'lodash';
-import { isEqual } from 'lodash';
 import one_player from './assets/one_player';
 import getOriginalStatRemove from './utils/getOriginalStatRemove';
 import QuizHeader from './components/QuizHeader';
@@ -38,16 +37,15 @@ function App() {
     );
     setStatsRemove(updateRemovedStats);
     console.log(updateRemovedStats);
-    if (updateRemovedStats.length > 0) {
     const stringifiedUpdatedStatsPlayers = JSON.stringify(
       updateRemovedStats.map((map) => Object.fromEntries(map))
     );
-      localStorage.setItem('removedStatsPlayers', stringifiedUpdatedStatsPlayers);
-    }
+    localStorage.setItem('removedStatsPlayers', stringifiedUpdatedStatsPlayers);
   }
 
   useEffect(() => {
-    if (userAnswers) {
+    // if user submits answers
+    if (userAnswers.size > 0) {
       handleCheckAnswers();
     }
     console.log(userAnswers);
@@ -101,7 +99,7 @@ function App() {
   //     localStorage.setItem('allStatsPlayers', JSON.stringify(stringifiedMap));
   //   };
   //   // getData();
-  // }, []); 
+  // }, []);
 
   /* Run using API ^^^-------------------------------------------------------------------------------*/
 
@@ -121,7 +119,9 @@ function App() {
     if (storedAllStatsPlayers !== '[]' && storedAllStatsPlayers !== null) {
       console.log('Extract data from storedAllStatsPlayer local storage');
       const parsedAllStatsPlayers = JSON.parse(storedAllStatsPlayers);
-      const convertedAllStatsPlayer = convertArrayObjsToArrayMaps(parsedAllStatsPlayers);
+      const convertedAllStatsPlayer = convertArrayObjsToArrayMaps(
+        parsedAllStatsPlayers
+      );
       setallStatsPlayers(convertedAllStatsPlayer);
     } else {
       console.log('Set inital state for allStatsPlayers');
@@ -135,13 +135,19 @@ function App() {
 
     // removedStatPlayers
 
-
-    const storedRemovedStatsPlayers = localStorage.getItem('removedStatsPlayers');
-    console.log(storedRemovedStatsPlayers)
-    if (storedRemovedStatsPlayers !== '[]' && storedRemovedStatsPlayers !== null) {
+    const storedRemovedStatsPlayers = localStorage.getItem(
+      'removedStatsPlayers'
+    );
+    console.log(storedRemovedStatsPlayers);
+    if (
+      storedRemovedStatsPlayers !== '[]' &&
+      storedRemovedStatsPlayers !== null
+    ) {
       console.log('Extract data from RemovedStatsPlayers local storage');
       const parsedRemovedStatsPlayers = JSON.parse(storedRemovedStatsPlayers);
-      const convertedRemovedStatsPlayers = convertArrayObjsToArrayMaps(parsedRemovedStatsPlayers);
+      const convertedRemovedStatsPlayers = convertArrayObjsToArrayMaps(
+        parsedRemovedStatsPlayers
+      );
       setStatsRemove(convertedRemovedStatsPlayers);
     } else {
       console.log('Set inital state for removedStatPlayers');
@@ -151,27 +157,39 @@ function App() {
       const stringifiedremovedStatsPlayers = JSON.stringify(
         removedStatsPlayers.map((map) => Object.fromEntries(map))
       );
-      localStorage.setItem('removedStatsPlayers', stringifiedremovedStatsPlayers);
+      localStorage.setItem(
+        'removedStatsPlayers',
+        stringifiedremovedStatsPlayers
+      );
     }
 
     // originalStatPlayers
     const storedOriginalStatRemove = localStorage.getItem('originalStatRemove');
-    if (storedOriginalStatRemove !== '[]' && storedOriginalStatRemove !== null) {
+    console.log(storedOriginalStatRemove);
+    
+    if (
+      storedOriginalStatRemove !== '[]' &&
+      storedOriginalStatRemove !== null
+    ) {
       console.log('original stats extracted from local storage');
       const parsedOriginalStatRemove = JSON.parse(storedOriginalStatRemove);
-      const convertedRemovedStatsPlayers = convertArrayObjsToArrayMaps(parsedOriginalStatRemove);
+      const convertedRemovedStatsPlayers = convertArrayObjsToArrayMaps(
+        parsedOriginalStatRemove
+      );
       setOriginalStatRemove(convertedRemovedStatsPlayers);
-    }
+    } 
   }, []);
 
   useEffect(() => {
-
     console.log(statsRemove);
     const storedOriginalStatRemove = localStorage.getItem('originalStatRemove');
     console.log(storedOriginalStatRemove);
 
     // if original is already set, don't set it again
-    if (storedOriginalStatRemove === '[]' || storedOriginalStatRemove === null) {
+    if (
+      storedOriginalStatRemove === '[]' ||
+      storedOriginalStatRemove === null
+    ) {
       console.log('No original stats present, set for first time');
       const originalStatRemoveClone = cloneDeep(
         statsRemove
@@ -182,7 +200,6 @@ function App() {
       );
       localStorage.setItem('originalStatRemove', stringifiedOriginalStatRemove);
     }
-    
   }, [statsRemove]);
 
   /* Run using local data ^^^ -------------------------------------------------------------------------- */
