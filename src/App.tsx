@@ -17,6 +17,7 @@ import setDataToLocalStorage from './utils/setDataToLocalStorage';
 import * as Progress from '@radix-ui/react-progress';
 import './ProgressBar.css'
 import calcEmptyFields from './utils/calcEmptyFields';
+import updateProgressBar from './utils/updateProgressBar';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
@@ -25,6 +26,7 @@ function App() {
     ModifiedStatsPlayer[]
   >([]);
   const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
+  const [progressBar, setProgressBar] = useState(0);
 
   const localStorageKeys = {
     allStatsPlayers: 'allStatsPlayers',
@@ -32,7 +34,6 @@ function App() {
     originalStatRemove: 'originalStatRemove',
   };
 
-  const [progressBar, setProgressBar] = useState(0);
   function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     const userAnswers = updateUserAnswers(e);
     setUserAnswers(userAnswers);
@@ -190,12 +191,9 @@ function App() {
       );
     }
 
-    // no need to ever update this stat if it's already set
-    const emptyFields: number = calcEmptyFields(statsRemove);
-    console.log(emptyFields);
-    const answeredFields = 10 - emptyFields
-    setProgressBar(answeredFields * 10) // multiply by scaling factor of 10, as progress bar is 1-100%
-    console.log(progressBar)
+    // Update Progress bar
+
+    updateProgressBar(statsRemove, originalStatsRemove, setProgressBar);
   }, [statsRemove]);
 
   /* Run using local data ^^^ -------------------------------------------------------------------------- */
