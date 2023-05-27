@@ -15,6 +15,8 @@ import one_player from './assets/one_player';
 import getOriginalStatRemove from './utils/getOriginalStatRemove';
 import QuizHeader from './components/QuizHeader';
 import convertArrayObjsToArrayMaps from './utils/convertArrayObjsToArrayMaps';
+import getDataFromLocalStorage from './utils/getDataFromLocalStorage';
+import setDataToLocalStorage from './utils/setDataToLocalStorage';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
@@ -23,6 +25,12 @@ function App() {
     ModifiedStatsPlayer[]
   >([]);
   const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
+
+  const localStorageKeys = {
+    allStatsPlayers: 'allStatsPlayers',
+    removedStatsPlayers: 'removedStatsPlayers',
+    originalStatRemove: 'originalStatRemove',
+  };
 
   function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     const userAnswers = updateUserAnswers(e);
@@ -112,29 +120,10 @@ function App() {
 
   useEffect(() => {
     console.log('browser refresh');
-  
-    const localStorageKeys = {
-      allStatsPlayers: 'allStatsPlayers',
-      removedStatsPlayers: 'removedStatsPlayers',
-      originalStatRemove: 'originalStatRemove',
-    };
-  
-    const getDataFromLocalStorage = (key: string) => {
-      const data = localStorage.getItem(key);
-      return data !== '[]' && data !== null ? JSON.parse(data) : null;
-    };
-  
-    const setDataToLocalStorage = (key: string, data: AllStatsPlayer[] | ModifiedStatsPlayer[]) => {
-      const stringifiedData = JSON.stringify(
-        data.map((map) => Object.fromEntries(map))
-      );
-      localStorage.setItem(key, stringifiedData);
-    };
-  
+
     // allStatPlayers
-    const storedAllStatsPlayers = getDataFromLocalStorage(
-      localStorageKeys.allStatsPlayers
-    );
+    const storedAllStatsPlayers: AllStatsPlayer[] | null =
+      getDataFromLocalStorage(localStorageKeys.allStatsPlayers);
     if (storedAllStatsPlayers) {
       console.log('Extract data from storedAllStatsPlayer local storage');
       const convertedAllStatsPlayer = convertArrayObjsToArrayMaps(
@@ -149,11 +138,10 @@ function App() {
         allStatsPlayersVar
       );
     }
-  
+
     // removedStatPlayers
-    const storedRemovedStatsPlayers: ModifiedStatsPlayer[] = getDataFromLocalStorage(
-      localStorageKeys.removedStatsPlayers
-    );
+    const storedRemovedStatsPlayers: ModifiedStatsPlayer[] | null =
+      getDataFromLocalStorage(localStorageKeys.removedStatsPlayers);
     if (storedRemovedStatsPlayers) {
       console.log('Extract data from removedStatsPlayers local storage');
       const convertedRemovedStatsPlayers = convertArrayObjsToArrayMaps(
@@ -169,11 +157,11 @@ function App() {
         removedStatsPlayers
       );
     }
-  
+
     // originalStatPlayers
-    const storedOriginalStatRemove: ModifiedStatsPlayer[] = getDataFromLocalStorage(
-      localStorageKeys.originalStatRemove
-    );
+    const storedOriginalStatRemove: ModifiedStatsPlayer[] | null =
+      getDataFromLocalStorage(localStorageKeys.originalStatRemove);
+    console.log(storedOriginalStatRemove);
     if (storedOriginalStatRemove) {
       console.log('Original stats extracted from local storage');
       const convertedRemovedStatsPlayers = convertArrayObjsToArrayMaps(
@@ -182,28 +170,26 @@ function App() {
       setOriginalStatRemove(convertedRemovedStatsPlayers);
     }
   }, []);
-  
 
   useEffect(() => {
     console.log(statsRemove);
-    const storedOriginalStatRemove = localStorage.getItem('originalStatRemove');
-    console.log(storedOriginalStatRemove);
+    const storedOriginalStatRemove: ModifiedStatsPlayer[] | null =
+      getDataFromLocalStorage(localStorageKeys.originalStatRemove);
 
     // if original is already set, don't set it again
     if (
-      storedOriginalStatRemove === '[]' ||
       storedOriginalStatRemove === null
     ) {
       console.log('No original stats present, set for first time');
-      const originalStatRemoveClone = cloneDeep(
-        statsRemove
-      ) as ModifiedStatsPlayer[];
+      const originalStatRemoveClone = cloneDeep(statsRemove);
       setOriginalStatRemove(originalStatRemoveClone);
-      const stringifiedOriginalStatRemove = JSON.stringify(
-        originalStatRemoveClone.map((map) => Object.fromEntries(map))
+      setDataToLocalStorage(
+        localStorageKeys.originalStatRemove,
+        originalStatRemoveClone
       );
-      localStorage.setItem('originalStatRemove', stringifiedOriginalStatRemove);
     }
+
+    // no need to ever update this stat if it's already set
   }, [statsRemove]);
 
   /* Run using local data ^^^ -------------------------------------------------------------------------- */
