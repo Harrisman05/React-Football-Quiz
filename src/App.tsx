@@ -15,7 +15,7 @@ import convertArrayObjsToArrayMaps from './utils/convertArrayObjsToArrayMaps';
 import getDataFromLocalStorage from './utils/getDataFromLocalStorage';
 import setDataToLocalStorage from './utils/setDataToLocalStorage';
 import * as Progress from '@radix-ui/react-progress';
-import './ProgressBar.css'
+import './ProgressBar.css';
 import calcEmptyFields from './utils/calcEmptyFields';
 import updateProgressBar from './utils/updateProgressBar';
 
@@ -179,9 +179,7 @@ function App() {
       getDataFromLocalStorage(localStorageKeys.originalStatRemove);
 
     // if original is already set, don't set it again
-    if (
-      storedOriginalStatRemove === null
-    ) {
+    if (storedOriginalStatRemove === null) {
       console.log('No original stats present, set for first time');
       const originalStatRemoveClone = cloneDeep(statsRemove);
       setOriginalStatRemove(originalStatRemoveClone);
@@ -237,13 +235,16 @@ function App() {
             <button type='submit'>Submit</button>
           </div>
         </form>
+        <div className='bg-cyan-100 flex justify-center gap-4 py-4'>
+          <Progress.Root className='ProgressRoot' value={progressBar}>
+            <Progress.Indicator
+              className='ProgressIndicator'
+              style={{ transform: `translateX(-${100 - progressBar}%)` }}
+            />
+          </Progress.Root>
+          <p>{progressBar ? progressBar : 0}%</p>
+        </div>
       </div>
-      <Progress.Root className='ProgressRoot' value={progressBar}>
-        <Progress.Indicator
-          className='ProgressIndicator'
-          style={{ transform: `translateX(-${100 - progressBar}%)` }}
-        />
-      </Progress.Root>
     </div>
   );
 }
