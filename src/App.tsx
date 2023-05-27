@@ -14,6 +14,10 @@ import QuizHeader from './components/QuizHeader';
 import convertArrayObjsToArrayMaps from './utils/convertArrayObjsToArrayMaps';
 import getDataFromLocalStorage from './utils/getDataFromLocalStorage';
 import setDataToLocalStorage from './utils/setDataToLocalStorage';
+import * as Progress from '@radix-ui/react-progress';
+import './ProgressBar.css'
+import calcEmptyFields from './utils/calcEmptyFields';
+import updateProgressBar from './utils/updateProgressBar';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
@@ -22,6 +26,7 @@ function App() {
     ModifiedStatsPlayer[]
   >([]);
   const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
+  const [progressBar, setProgressBar] = useState(0);
 
   const localStorageKeys = {
     allStatsPlayers: 'allStatsPlayers',
@@ -186,7 +191,9 @@ function App() {
       );
     }
 
-    // no need to ever update this stat if it's already set
+    // Update Progress bar
+
+    updateProgressBar(statsRemove, originalStatsRemove, setProgressBar);
   }, [statsRemove]);
 
   /* Run using local data ^^^ -------------------------------------------------------------------------- */
@@ -231,6 +238,12 @@ function App() {
           </div>
         </form>
       </div>
+      <Progress.Root className='ProgressRoot' value={progressBar}>
+        <Progress.Indicator
+          className='ProgressIndicator'
+          style={{ transform: `translateX(-${100 - progressBar}%)` }}
+        />
+      </Progress.Root>
     </div>
   );
 }

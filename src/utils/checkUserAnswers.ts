@@ -8,11 +8,11 @@ import UserAnswerPlayer from '../types/userAnswerPlayer';
 
 export default function checkUserAnswers(
   allStatsPlayers: AllStatsPlayer[],
-  statRemove: ModifiedStatsPlayer[],
+  statsRemove: ModifiedStatsPlayer[],
   userAnswers: UserAnswers
 ) 
 {
-  for (let player of statRemove) {
+  for (let player of statsRemove) {
     // extract keys to use to start extracting players from all the maps
     const currentKey = getCurrentKey(player);
 
@@ -30,7 +30,7 @@ export default function checkUserAnswers(
     checkNationalityAnswer(allStatPlayer, removedStatPlayer, userAnswerPlayer);
     checkTeamAnswer(allStatPlayer, removedStatPlayer, userAnswerPlayer);
   }
-  return [...statRemove];
+  return [...statsRemove];
 }
 
 function getAllStatPlayer(
