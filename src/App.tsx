@@ -14,6 +14,9 @@ import QuizHeader from './components/QuizHeader';
 import convertArrayObjsToArrayMaps from './utils/convertArrayObjsToArrayMaps';
 import getDataFromLocalStorage from './utils/getDataFromLocalStorage';
 import setDataToLocalStorage from './utils/setDataToLocalStorage';
+import * as Progress from '@radix-ui/react-progress';
+import './ProgressBar.css'
+import calcEmptyFields from './utils/calcEmptyFields';
 
 function App() {
   const [allStatsPlayers, setallStatsPlayers] = useState<AllStatsPlayer[]>([]);
@@ -29,6 +32,7 @@ function App() {
     originalStatRemove: 'originalStatRemove',
   };
 
+  const [progressBar, setProgressBar] = useState(0);
   function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     const userAnswers = updateUserAnswers(e);
     setUserAnswers(userAnswers);
@@ -187,6 +191,11 @@ function App() {
     }
 
     // no need to ever update this stat if it's already set
+    const emptyFields: number = calcEmptyFields(statsRemove);
+    console.log(emptyFields);
+    const answeredFields = 10 - emptyFields
+    setProgressBar(answeredFields * 10) // multiply by scaling factor of 10, as progress bar is 1-100%
+    console.log(progressBar)
   }, [statsRemove]);
 
   /* Run using local data ^^^ -------------------------------------------------------------------------- */
@@ -231,6 +240,12 @@ function App() {
           </div>
         </form>
       </div>
+      <Progress.Root className='ProgressRoot' value={progressBar}>
+        <Progress.Indicator
+          className='ProgressIndicator'
+          style={{ transform: `translateX(-${100 - progressBar}%)` }}
+        />
+      </Progress.Root>
     </div>
   );
 }
