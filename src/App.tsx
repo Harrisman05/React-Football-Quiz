@@ -112,73 +112,77 @@ function App() {
 
   useEffect(() => {
     console.log('browser refresh');
-
+  
+    const localStorageKeys = {
+      allStatsPlayers: 'allStatsPlayers',
+      removedStatsPlayers: 'removedStatsPlayers',
+      originalStatRemove: 'originalStatRemove',
+    };
+  
+    const getDataFromLocalStorage = (key: string) => {
+      const data = localStorage.getItem(key);
+      return data !== '[]' && data !== null ? JSON.parse(data) : null;
+    };
+  
+    const setDataToLocalStorage = (key: string, data: AllStatsPlayer[] | ModifiedStatsPlayer[]) => {
+      const stringifiedData = JSON.stringify(
+        data.map((map) => Object.fromEntries(map))
+      );
+      localStorage.setItem(key, stringifiedData);
+    };
+  
     // allStatPlayers
-
-    const storedAllStatsPlayers = localStorage.getItem('allStatsPlayers');
-    if (storedAllStatsPlayers !== '[]' && storedAllStatsPlayers !== null) {
+    const storedAllStatsPlayers = getDataFromLocalStorage(
+      localStorageKeys.allStatsPlayers
+    );
+    if (storedAllStatsPlayers) {
       console.log('Extract data from storedAllStatsPlayer local storage');
-      const parsedAllStatsPlayers = JSON.parse(storedAllStatsPlayers);
       const convertedAllStatsPlayer = convertArrayObjsToArrayMaps(
-        parsedAllStatsPlayers
+        storedAllStatsPlayers
       );
       setallStatsPlayers(convertedAllStatsPlayer);
     } else {
-      console.log('Set inital state for allStatsPlayers');
+      console.log('Set initial state for allStatsPlayers');
       setallStatsPlayers(allStatsPlayersVar);
-      // Maps are not valid JSON, so convert each map into object first before stringifying
-      const stringifiedAllStatsPlayer = JSON.stringify(
-        allStatsPlayersVar.map((map) => Object.fromEntries(map))
+      setDataToLocalStorage(
+        localStorageKeys.allStatsPlayers,
+        allStatsPlayersVar
       );
-      localStorage.setItem('allStatsPlayers', stringifiedAllStatsPlayer);
     }
-
+  
     // removedStatPlayers
-
-    const storedRemovedStatsPlayers = localStorage.getItem(
-      'removedStatsPlayers'
+    const storedRemovedStatsPlayers: ModifiedStatsPlayer[] = getDataFromLocalStorage(
+      localStorageKeys.removedStatsPlayers
     );
-    console.log(storedRemovedStatsPlayers);
-    if (
-      storedRemovedStatsPlayers !== '[]' &&
-      storedRemovedStatsPlayers !== null
-    ) {
-      console.log('Extract data from RemovedStatsPlayers local storage');
-      const parsedRemovedStatsPlayers = JSON.parse(storedRemovedStatsPlayers);
+    if (storedRemovedStatsPlayers) {
+      console.log('Extract data from removedStatsPlayers local storage');
       const convertedRemovedStatsPlayers = convertArrayObjsToArrayMaps(
-        parsedRemovedStatsPlayers
+        storedRemovedStatsPlayers
       );
       setStatsRemove(convertedRemovedStatsPlayers);
     } else {
-      console.log('Set inital state for removedStatPlayers');
+      console.log('Set initial state for removedStatPlayers');
       const removedStatsPlayers = createRemovedStatsPlayers(allStatsPlayersVar);
       setStatsRemove(removedStatsPlayers);
-      // Maps are not valid JSON, so convert each map into object first before stringifying
-      const stringifiedremovedStatsPlayers = JSON.stringify(
-        removedStatsPlayers.map((map) => Object.fromEntries(map))
-      );
-      localStorage.setItem(
-        'removedStatsPlayers',
-        stringifiedremovedStatsPlayers
+      setDataToLocalStorage(
+        localStorageKeys.removedStatsPlayers,
+        removedStatsPlayers
       );
     }
-
+  
     // originalStatPlayers
-    const storedOriginalStatRemove = localStorage.getItem('originalStatRemove');
-    console.log(storedOriginalStatRemove);
-    
-    if (
-      storedOriginalStatRemove !== '[]' &&
-      storedOriginalStatRemove !== null
-    ) {
-      console.log('original stats extracted from local storage');
-      const parsedOriginalStatRemove = JSON.parse(storedOriginalStatRemove);
+    const storedOriginalStatRemove: ModifiedStatsPlayer[] = getDataFromLocalStorage(
+      localStorageKeys.originalStatRemove
+    );
+    if (storedOriginalStatRemove) {
+      console.log('Original stats extracted from local storage');
       const convertedRemovedStatsPlayers = convertArrayObjsToArrayMaps(
-        parsedOriginalStatRemove
+        storedOriginalStatRemove
       );
       setOriginalStatRemove(convertedRemovedStatsPlayers);
-    } 
+    }
   }, []);
+  
 
   useEffect(() => {
     console.log(statsRemove);
