@@ -41,10 +41,10 @@ function removeRandomStat(
   currentKey: any,
   randomStatToRemove: string
 ) {
-  if (el.get(currentKey) !== undefined) {
+  if (el[currentKey] !== undefined) {
     // check that the player value is not undefined, better safety
     // Non-null expression You can postfix an expression with ! to tell TypeScript that you know it's not null or undefined. This works the same as an 'as' assertion.
-    el.get(currentKey)![randomStatToRemove] = '';
-    el.get(currentKey)!.name = ''; // always remove name
+    el[currentKey]![randomStatToRemove] = '';
+    el[currentKey]!.name = ''; // always remove name
   }
 }

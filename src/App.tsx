@@ -146,10 +146,8 @@ function App() {
       getDataFromLocalStorage(localStorageKeys.removedStatsPlayers);
     if (storedRemovedStatsPlayers) {
       console.log('Extract data from removedStatsPlayers local storage');
-      const convertedRemovedStatsPlayers = convertArrayObjsToArrayMaps(
-        storedRemovedStatsPlayers
-      );
-      setStatsRemove(convertedRemovedStatsPlayers);
+      console.log(storedRemovedStatsPlayers)
+      setStatsRemove(storedRemovedStatsPlayers);
     } else {
       console.log('Set initial state for removedStatPlayers');
       const removedStatsPlayers = createRemovedStatsPlayers(allStatsPlayersVar);
@@ -191,7 +189,7 @@ function App() {
 
     // Update Progress bar
 
-    updateProgressBar(statsRemove, originalStatsRemove, setProgressBar);
+    // updateProgressBar(statsRemove, originalStatsRemove, setProgressBar);
   }, [statsRemove]);
 
   /* Run using local data ^^^ -------------------------------------------------------------------------- */
@@ -202,8 +200,11 @@ function App() {
         <QuizHeader />
         <form onSubmit={handleFormSubmit}>
           {statsRemove.map((player: ModifiedStatsPlayer) => {
-            const currentPlayerStats = [...player.entries()][0]; // extracting id and data out of each map object
-            const [id, stats] = currentPlayerStats; // extracting id and data out of each map object
+            console.log(player);
+            const currentPlayerStats = Object.entries(player)[0];
+            const [id, stats] = Object.entries(player)[0];
+            console.log(id)
+            console.log(stats)
             const originalStats = getOriginalStatRemove(
               originalStatsRemove,
               id
@@ -235,7 +236,7 @@ function App() {
             <button type='submit'>Submit</button>
           </div>
         </form>
-        <div className='bg-cyan-100 flex justify-center gap-4 py-4'>
+        {/* <div className='bg-cyan-100 flex justify-center gap-4 py-4'>
           <Progress.Root className='ProgressRoot' value={progressBar}>
             <Progress.Indicator
               className='ProgressIndicator'
@@ -243,7 +244,7 @@ function App() {
             />
           </Progress.Root>
           <p>{progressBar ? progressBar : 0}%</p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

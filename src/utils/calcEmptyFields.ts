@@ -6,6 +6,7 @@ export default function calcEmptyFields(statsRemove: ModifiedStatsPlayer[]): num
   console.log(statsRemove);
 
   const allEmptyFields = statsRemove.reduce((acc: number, player) => {
+    console.log(player);
     const currentKey = getCurrentKey(player);
     console.log(currentKey);
     console.log(player.get(currentKey));
