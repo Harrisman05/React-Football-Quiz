@@ -11,7 +11,6 @@ import QuizField from './components/QuizField';
 import { cloneDeep } from 'lodash';
 import getOriginalStatRemove from './utils/getOriginalStatRemove';
 import QuizHeader from './components/QuizHeader';
-import convertArrayObjsToArrayMaps from './utils/convertArrayObjsToArrayMaps';
 import getDataFromLocalStorage from './utils/getDataFromLocalStorage';
 import setDataToLocalStorage from './utils/setDataToLocalStorage';
 import * as Progress from '@radix-ui/react-progress';
@@ -47,10 +46,7 @@ function App() {
     );
     setStatsRemove(updateRemovedStats);
     console.log(updateRemovedStats);
-    const stringifiedUpdatedStatsPlayers = JSON.stringify(
-      updateRemovedStats.map((map) => Object.fromEntries(map))
-    );
-    localStorage.setItem('removedStatsPlayers', stringifiedUpdatedStatsPlayers);
+    localStorage.setItem('removedStatsPlayers', JSON.stringify(updateRemovedStats));
   }
 
   useEffect(() => {
@@ -128,10 +124,7 @@ function App() {
       getDataFromLocalStorage(localStorageKeys.allStatsPlayers);
     if (storedAllStatsPlayers) {
       console.log('Extract data from storedAllStatsPlayer local storage');
-      const convertedAllStatsPlayer = convertArrayObjsToArrayMaps(
-        storedAllStatsPlayers
-      );
-      setallStatsPlayers(convertedAllStatsPlayer);
+      setallStatsPlayers(storedAllStatsPlayers);
     } else {
       console.log('Set initial state for allStatsPlayers');
       setallStatsPlayers(allStatsPlayersVar);
@@ -164,10 +157,7 @@ function App() {
     console.log(storedOriginalStatRemove);
     if (storedOriginalStatRemove) {
       console.log('Original stats extracted from local storage');
-      const convertedRemovedStatsPlayers = convertArrayObjsToArrayMaps(
-        storedOriginalStatRemove
-      );
-      setOriginalStatRemove(convertedRemovedStatsPlayers);
+      setOriginalStatRemove(storedOriginalStatRemove);
     }
   }, []);
 
