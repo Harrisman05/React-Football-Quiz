@@ -1,9 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import example_json from './assets/example_json';
-import PlayerStats from './types/PlayerStats';
 import AllStatsPlayer from './types/AllStatsPlayer';
 import ModifiedStatsPlayer from './types/ModifiedStatsPlayer';
-import removeAbbrevName from './utils/removeAbbrevName';
 import UserAnswers from './types/UserAnswers';
 import extractAllStats from './utils/extractAllStats';
 import createRemovedStatsPlayers from './utils/createRemovedStatsPlayers';
@@ -11,7 +9,6 @@ import updateUserAnswers from './utils/updateUserAnswers';
 import checkUserAnswers from './utils/checkUserAnswers';
 import QuizField from './components/QuizField';
 import { cloneDeep } from 'lodash';
-import one_player from './assets/one_player';
 import getOriginalStatRemove from './utils/getOriginalStatRemove';
 import QuizHeader from './components/QuizHeader';
 import convertArrayObjsToArrayMaps from './utils/convertArrayObjsToArrayMaps';
