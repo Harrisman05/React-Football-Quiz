@@ -38,7 +38,7 @@ function getRandomStatToRemove() {
 
 function removeRandomStat(
   el: ModifiedStatsPlayer,
-  currentKey: any,
+  currentKey: string,
   randomStatToRemove: string
 ) {
   if (el[currentKey] !== undefined) {

@@ -1,4 +1,4 @@
-export default interface RemovedStatPlayer {
+export default interface RemovedStatPlayerProps {
     [key: string]: string | number;
     name: string;
     firstname: string;

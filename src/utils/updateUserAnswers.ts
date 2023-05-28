@@ -5,7 +5,7 @@ export default function updateUserAnswers(e: React.FormEvent<HTMLFormElement>) {
   const form = e.currentTarget; // currentTarget because event.target can be anything because of event bubbling - https://stackoverflow.com/questions/73819465/argument-of-type-eventtarget-is-not-assignable-to-parameter-of-type-htmlforme
 
   const formData = new FormData(form);
-  const userAnswers: object = {}; 
+  const userAnswers: UserAnswers = {}; 
 
   // Loop through all user entries, and update userAnswer object, which triggers useEffect to handle check answers
   for (const [inputTypeHyphenated, value] of formData.entries()) {
@@ -30,7 +30,7 @@ function extractInputType(inputType: string): [number, string] {
 // Using single responsibility principle with functions performing one defined action
 
 function setId(
-  userAnswers: object,
+  userAnswers: UserAnswers,
   id: number,
   name: string,
   value: FormDataEntryValue
@@ -43,7 +43,7 @@ function setId(
 }
 
 function updateValue(
-  userAnswers: object,
+  userAnswers: UserAnswers,
   id: number,
   name: string,
   value: FormDataEntryValue

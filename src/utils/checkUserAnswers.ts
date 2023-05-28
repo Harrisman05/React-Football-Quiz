@@ -1,26 +1,24 @@
-import AllStatPlayerReduce from '../types/AllStatPlayerReduce';
 import AllStatsPlayer from '../types/AllStatsPlayer';
 import ModifiedStatsPlayer from '../types/ModifiedStatsPlayer';
 import UserAnswers from '../types/UserAnswers';
 import getCurrentKey from './getCurrentKey';
-import RemovedStatPlayer from '../types/removedStatPlayer';
-import UserAnswerPlayer from '../types/userAnswerPlayer';
+import RemovedStatPlayerProps from '../types/RemovedStatPlayerProps';
+import UserAnswerPlayerProps from '../types/UserAnswerPlayerProps';
+import AllStatsPlayerProps from '../types/AllStatsPlayerProps';
 
 export default function checkUserAnswers(
   allStatsPlayers: AllStatsPlayer[],
   statsRemove: ModifiedStatsPlayer[],
   userAnswers: UserAnswers
-) 
-{
+) {
   for (let player of statsRemove) {
     // extract keys to use to start extracting players from all the maps
     const currentKey = getCurrentKey(player);
 
     // Using key, extract data of player for user answers, removed stats and all stats
-    const userAnswerPlayer: UserAnswerPlayer | undefined =
+    const userAnswerPlayer: UserAnswerPlayerProps | undefined =
       userAnswers[currentKey];
-    const removedStatPlayer: RemovedStatPlayer | undefined =
-      player[currentKey];
+    const removedStatPlayer: RemovedStatPlayerProps | undefined = player[currentKey];
     const allStatPlayer = getAllStatPlayer(allStatsPlayers, currentKey);
 
     debugLogs(allStatPlayer, removedStatPlayer, userAnswerPlayer);
@@ -35,11 +33,11 @@ export default function checkUserAnswers(
 
 function getAllStatPlayer(
   allStatsPlayers: AllStatsPlayer[],
-  currentKey: number
+  currentKey: string
 ) {
   // This is a bit messy, can't figure out how to ensure a map with key is found to prevent the undefined type being possible
   return allStatsPlayers.reduce(
-    (acc: AllStatPlayerReduce | undefined, el: AllStatsPlayer) => {
+    (acc: AllStatsPlayerProps | undefined, el: AllStatsPlayer) => {
       if (el[currentKey]) {
         acc = el[currentKey];
       }
@@ -50,9 +48,9 @@ function getAllStatPlayer(
 }
 
 function debugLogs(
-  allStatPlayer: AllStatPlayerReduce | undefined,
-  removedStatPlayer: RemovedStatPlayer | undefined,
-  userAnswerPlayer: UserAnswerPlayer | undefined
+  allStatPlayer: AllStatsPlayerProps | undefined,
+  removedStatPlayer: RemovedStatPlayerProps | undefined,
+  userAnswerPlayer: UserAnswerPlayerProps | undefined
 ) {
   // Logs
   console.log(allStatPlayer);
@@ -64,9 +62,9 @@ function debugLogs(
 }
 
 function checkNameAnswer(
-  allStatPlayer: AllStatPlayerReduce | undefined,
-  removedStatPlayer: RemovedStatPlayer | undefined,
-  userAnswerPlayer: UserAnswerPlayer | undefined
+  allStatPlayer: AllStatsPlayerProps | undefined,
+  removedStatPlayer: RemovedStatPlayerProps | undefined,
+  userAnswerPlayer: UserAnswerPlayerProps | undefined
 ) {
   if (userAnswerPlayer?.hasOwnProperty('name')) {
     console.log('found name');
@@ -78,9 +76,9 @@ function checkNameAnswer(
 }
 
 function checkNationalityAnswer(
-  allStatPlayer: AllStatPlayerReduce | undefined,
-  removedStatPlayer: RemovedStatPlayer | undefined,
-  userAnswerPlayer: UserAnswerPlayer | undefined
+  allStatPlayer: AllStatsPlayerProps | undefined,
+  removedStatPlayer: RemovedStatPlayerProps | undefined,
+  userAnswerPlayer: UserAnswerPlayerProps | undefined
 ) {
   if (userAnswerPlayer?.hasOwnProperty('nationality')) {
     console.log('found nationality');
@@ -92,9 +90,9 @@ function checkNationalityAnswer(
 }
 
 function checkTeamAnswer(
-  allStatPlayer: AllStatPlayerReduce | undefined,
-  removedStatPlayer: RemovedStatPlayer | undefined,
-  userAnswerPlayer: UserAnswerPlayer | undefined
+  allStatPlayer: AllStatsPlayerProps | undefined,
+  removedStatPlayer: RemovedStatPlayerProps | undefined,
+  userAnswerPlayer: UserAnswerPlayerProps | undefined
 ) {
   if (userAnswerPlayer?.hasOwnProperty('team')) {
     console.log('found team');

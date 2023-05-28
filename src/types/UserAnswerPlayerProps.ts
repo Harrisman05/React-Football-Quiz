@@ -1,4 +1,4 @@
-export default interface UserAnswerPlayer {
+export default interface UserAnswerPlayerProps {
   [key: string]: FormDataEntryValue | undefined;
   name?: '' | undefined;
   nationality?: string | undefined;
