@@ -11,7 +11,6 @@ import QuizField from './components/QuizField';
 import { cloneDeep } from 'lodash';
 import getOriginalStatRemove from './utils/getOriginalStatRemove';
 import QuizHeader from './components/QuizHeader';
-import convertArrayObjsToArrayMaps from './utils/convertArrayObjsToArrayMaps';
 import getDataFromLocalStorage from './utils/getDataFromLocalStorage';
 import setDataToLocalStorage from './utils/setDataToLocalStorage';
 import * as Progress from '@radix-ui/react-progress';
@@ -25,7 +24,7 @@ function App() {
   const [originalStatsRemove, setOriginalStatRemove] = useState<
     ModifiedStatsPlayer[]
   >([]);
-  const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
+  const [userAnswers, setUserAnswers] = useState<object>({});
   const [progressBar, setProgressBar] = useState(0);
 
   const localStorageKeys = {
@@ -47,15 +46,12 @@ function App() {
     );
     setStatsRemove(updateRemovedStats);
     console.log(updateRemovedStats);
-    const stringifiedUpdatedStatsPlayers = JSON.stringify(
-      updateRemovedStats.map((map) => Object.fromEntries(map))
-    );
-    localStorage.setItem('removedStatsPlayers', stringifiedUpdatedStatsPlayers);
+    localStorage.setItem('removedStatsPlayers', JSON.stringify(updateRemovedStats));
   }
 
   useEffect(() => {
     // if user submits answers
-    if (userAnswers.size > 0) {
+    if (Object.keys(userAnswers).length > 0) {
       handleCheckAnswers();
     }
     console.log(userAnswers);
@@ -128,10 +124,7 @@ function App() {
       getDataFromLocalStorage(localStorageKeys.allStatsPlayers);
     if (storedAllStatsPlayers) {
       console.log('Extract data from storedAllStatsPlayer local storage');
-      const convertedAllStatsPlayer = convertArrayObjsToArrayMaps(
-        storedAllStatsPlayers
-      );
-      setallStatsPlayers(convertedAllStatsPlayer);
+      setallStatsPlayers(storedAllStatsPlayers);
     } else {
       console.log('Set initial state for allStatsPlayers');
       setallStatsPlayers(allStatsPlayersVar);
@@ -146,10 +139,8 @@ function App() {
       getDataFromLocalStorage(localStorageKeys.removedStatsPlayers);
     if (storedRemovedStatsPlayers) {
       console.log('Extract data from removedStatsPlayers local storage');
-      const convertedRemovedStatsPlayers = convertArrayObjsToArrayMaps(
-        storedRemovedStatsPlayers
-      );
-      setStatsRemove(convertedRemovedStatsPlayers);
+      console.log(storedRemovedStatsPlayers)
+      setStatsRemove(storedRemovedStatsPlayers);
     } else {
       console.log('Set initial state for removedStatPlayers');
       const removedStatsPlayers = createRemovedStatsPlayers(allStatsPlayersVar);
@@ -166,10 +157,7 @@ function App() {
     console.log(storedOriginalStatRemove);
     if (storedOriginalStatRemove) {
       console.log('Original stats extracted from local storage');
-      const convertedRemovedStatsPlayers = convertArrayObjsToArrayMaps(
-        storedOriginalStatRemove
-      );
-      setOriginalStatRemove(convertedRemovedStatsPlayers);
+      setOriginalStatRemove(storedOriginalStatRemove);
     }
   }, []);
 
@@ -190,8 +178,8 @@ function App() {
     }
 
     // Update Progress bar
-
     updateProgressBar(statsRemove, originalStatsRemove, setProgressBar);
+
   }, [statsRemove]);
 
   /* Run using local data ^^^ -------------------------------------------------------------------------- */
@@ -202,8 +190,11 @@ function App() {
         <QuizHeader />
         <form onSubmit={handleFormSubmit}>
           {statsRemove.map((player: ModifiedStatsPlayer) => {
-            const currentPlayerStats = [...player.entries()][0]; // extracting id and data out of each map object
-            const [id, stats] = currentPlayerStats; // extracting id and data out of each map object
+            console.log(player);
+            const currentPlayerStats = Object.entries(player)[0];
+            const [id, stats] = Object.entries(player)[0];
+            console.log(id)
+            console.log(stats)
             const originalStats = getOriginalStatRemove(
               originalStatsRemove,
               id

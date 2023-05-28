@@ -18,9 +18,9 @@ export default function checkUserAnswers(
 
     // Using key, extract data of player for user answers, removed stats and all stats
     const userAnswerPlayer: UserAnswerPlayer | undefined =
-      userAnswers.get(currentKey);
+      userAnswers[currentKey];
     const removedStatPlayer: RemovedStatPlayer | undefined =
-      player.get(currentKey);
+      player[currentKey];
     const allStatPlayer = getAllStatPlayer(allStatsPlayers, currentKey);
 
     debugLogs(allStatPlayer, removedStatPlayer, userAnswerPlayer);
@@ -40,8 +40,8 @@ function getAllStatPlayer(
   // This is a bit messy, can't figure out how to ensure a map with key is found to prevent the undefined type being possible
   return allStatsPlayers.reduce(
     (acc: AllStatPlayerReduce | undefined, el: AllStatsPlayer) => {
-      if (el.get(currentKey)) {
-        acc = el.get(currentKey);
+      if (el[currentKey]) {
+        acc = el[currentKey];
       }
       return acc;
     },

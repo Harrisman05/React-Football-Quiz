@@ -6,10 +6,11 @@ export default function calcEmptyFields(statsRemove: ModifiedStatsPlayer[]): num
   console.log(statsRemove);
 
   const allEmptyFields = statsRemove.reduce((acc: number, player) => {
+    console.log(player);
     const currentKey = getCurrentKey(player);
     console.log(currentKey);
-    console.log(player.get(currentKey));
-    const currentPlayerStats = player.get(currentKey) as RemovedStatPlayer; // type asserted to prevent overload method in Object.entries
+    console.log(player[currentKey]);
+    const currentPlayerStats = player[currentKey] as RemovedStatPlayer; // type asserted to prevent overload method in Object.entries
 
     const currentPlayerValues = Object.values(currentPlayerStats);
     console.log(currentPlayerValues);

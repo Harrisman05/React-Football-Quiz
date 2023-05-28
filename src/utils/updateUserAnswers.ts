@@ -5,16 +5,16 @@ export default function updateUserAnswers(e: React.FormEvent<HTMLFormElement>) {
   const form = e.currentTarget; // currentTarget because event.target can be anything because of event bubbling - https://stackoverflow.com/questions/73819465/argument-of-type-eventtarget-is-not-assignable-to-parameter-of-type-htmlforme
 
   const formData = new FormData(form);
-  const userAnswers: UserAnswers = new Map();
+  const userAnswers: object = {}; 
 
   // Loop through all user entries, and update userAnswer object, which triggers useEffect to handle check answers
   for (const [inputTypeHyphenated, value] of formData.entries()) {
     const [id, name] = extractInputType(inputTypeHyphenated);
 
-      !userAnswers.has(id) ? setId(userAnswers, id, name, value) : 
-      updateValue(userAnswers, id, name, value);
+    !userAnswers.hasOwnProperty(id) ? setId(userAnswers, id, name, value) : 
+    updateValue(userAnswers, id, name, value);
     }
-    console.log(typeof userAnswers);
+    console.log(userAnswers);
     return userAnswers;
 }
 
@@ -30,27 +30,28 @@ function extractInputType(inputType: string): [number, string] {
 // Using single responsibility principle with functions performing one defined action
 
 function setId(
-  userAnswers: UserAnswers,
+  userAnswers: object,
   id: number,
   name: string,
   value: FormDataEntryValue
 ) {
   // set id as a key on the user answer map if it doesn't exist
-  userAnswers.set(id, {
-    [name]: value,
-  });
+
+  userAnswers[id] = {
+    [name]: value
+  };
 }
 
 function updateValue(
-  userAnswers: UserAnswers,
+  userAnswers: object,
   id: number,
   name: string,
   value: FormDataEntryValue
 ) {
-  const answerObject = userAnswers.get(id);
+  const answerObject = userAnswers[id];
   const updatedAnswer = {
     ...answerObject,
     [name]: value,
   };
-  userAnswers.set(id, updatedAnswer);
+  userAnswers[id] = updatedAnswer;
 }
