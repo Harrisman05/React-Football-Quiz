@@ -1,5 +1,5 @@
 import AllStatsPlayer from '../types/AllStatsPlayer';
-import PlayerStats from '../types/PlayerStats';
+import ApiPlayerStats from '../types/ApiPlayerStats';
 import removeAbbrevName from './removeAbbrevName';
 
 export default function extractAllStats(jsonData: any): AllStatsPlayer[] {
@@ -8,8 +8,8 @@ export default function extractAllStats(jsonData: any): AllStatsPlayer[] {
   */
 
   const allStatsPlayer: AllStatsPlayer[] = jsonData.map(
-    (el: PlayerStats, index: number) => {
-      const playerStats: any = {};
+    (el: ApiPlayerStats, index: number) => {
+      const playerStats: AllStatsPlayer = {};
       playerStats[el.player.id] = {
         name: removeAbbrevName(el.player.name),
         firstname: el.player.firstname,

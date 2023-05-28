@@ -24,7 +24,7 @@ function App() {
   const [originalStatsRemove, setOriginalStatRemove] = useState<
     ModifiedStatsPlayer[]
   >([]);
-  const [userAnswers, setUserAnswers] = useState<object>({});
+  const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
   const [progressBar, setProgressBar] = useState(0);
 
   const localStorageKeys = {
@@ -46,7 +46,10 @@ function App() {
     );
     setStatsRemove(updateRemovedStats);
     console.log(updateRemovedStats);
-    localStorage.setItem('removedStatsPlayers', JSON.stringify(updateRemovedStats));
+    localStorage.setItem(
+      'removedStatsPlayers',
+      JSON.stringify(updateRemovedStats)
+    );
   }
 
   useEffect(() => {
@@ -139,7 +142,7 @@ function App() {
       getDataFromLocalStorage(localStorageKeys.removedStatsPlayers);
     if (storedRemovedStatsPlayers) {
       console.log('Extract data from removedStatsPlayers local storage');
-      console.log(storedRemovedStatsPlayers)
+      console.log(storedRemovedStatsPlayers);
       setStatsRemove(storedRemovedStatsPlayers);
     } else {
       console.log('Set initial state for removedStatPlayers');
@@ -179,7 +182,6 @@ function App() {
 
     // Update Progress bar
     updateProgressBar(statsRemove, originalStatsRemove, setProgressBar);
-
   }, [statsRemove]);
 
   /* Run using local data ^^^ -------------------------------------------------------------------------- */
@@ -193,12 +195,12 @@ function App() {
             console.log(player);
             const currentPlayerStats = Object.entries(player)[0];
             const [id, stats] = Object.entries(player)[0];
-            console.log(id)
-            console.log(stats)
+            console.log(id);
+            console.log(stats);
             const originalStats = getOriginalStatRemove(
               originalStatsRemove,
               id
-            ); // use weird reduce method to get the stats object out of map using id
+            ); // use weird reduce method to get the stats object out of object using id
 
             return (
               <div key={id.toString()} className='flex'>
