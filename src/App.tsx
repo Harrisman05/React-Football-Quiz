@@ -24,7 +24,7 @@ function App() {
   const [originalStatsRemove, setOriginalStatRemove] = useState<
     ModifiedStatsPlayer[]
   >([]);
-  const [userAnswers, setUserAnswers] = useState<UserAnswers>(new Map());
+  const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
   const [progressBar, setProgressBar] = useState(0);
 
   const localStorageKeys = {
@@ -51,7 +51,7 @@ function App() {
 
   useEffect(() => {
     // if user submits answers
-    if (userAnswers.size > 0) {
+    if (Object.keys(userAnswers).length > 0) {
       handleCheckAnswers();
     }
     console.log(userAnswers);
