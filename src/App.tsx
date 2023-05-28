@@ -24,7 +24,7 @@ function App() {
   const [originalStatsRemove, setOriginalStatRemove] = useState<
     ModifiedStatsPlayer[]
   >([]);
-  const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
+  const [userAnswers, setUserAnswers] = useState<object>({});
   const [progressBar, setProgressBar] = useState(0);
 
   const localStorageKeys = {
@@ -178,8 +178,8 @@ function App() {
     }
 
     // Update Progress bar
+    updateProgressBar(statsRemove, originalStatsRemove, setProgressBar);
 
-    // updateProgressBar(statsRemove, originalStatsRemove, setProgressBar);
   }, [statsRemove]);
 
   /* Run using local data ^^^ -------------------------------------------------------------------------- */
@@ -226,7 +226,7 @@ function App() {
             <button type='submit'>Submit</button>
           </div>
         </form>
-        {/* <div className='bg-cyan-100 flex justify-center gap-4 py-4'>
+        <div className='bg-cyan-100 flex justify-center gap-4 py-4'>
           <Progress.Root className='ProgressRoot' value={progressBar}>
             <Progress.Indicator
               className='ProgressIndicator'
@@ -234,7 +234,7 @@ function App() {
             />
           </Progress.Root>
           <p>{progressBar ? progressBar : 0}%</p>
-        </div> */}
+        </div>
       </div>
     </div>
   );
